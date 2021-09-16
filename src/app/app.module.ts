@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
-import { DrawingComponent } from './components/drawing/drawing.component';
 import { ElementComponent } from './components/element/element.component';
 import { GroupComponent } from './components/group/group.component';
 
@@ -13,7 +12,6 @@ import { GroupComponent } from './components/group/group.component';
     AppComponent,
     CanvasComponent,
     ElementComponent,
-    DrawingComponent,
     GroupComponent,
   ],
   imports: [BrowserModule, AppRoutingModule],
