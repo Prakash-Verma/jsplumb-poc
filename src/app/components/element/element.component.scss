@@ -1,9 +1,11 @@
 .node {
-  position: absolute;
+  position: relative;
   padding: 4px 12px;
   border-radius: 14px;
   border: 1px solid blue;
   text-align: center;
+  margin: 5px;
+  width: 100px;
 }
 
 .target-connection {
