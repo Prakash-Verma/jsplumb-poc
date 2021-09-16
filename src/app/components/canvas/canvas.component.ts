@@ -1,6 +1,7 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { newInstance } from '@jsplumb/browser-ui';
-import { DotEndpoint } from '@jsplumb/core';
+import { AfterViewInit, Component, ViewContainerRef } from '@angular/core';
+import { PlumbService } from 'src/app/services/plumb.service';
+
+const elementPrefix = 'Element';
 
 @Component({
   selector: 'app-canvas',
@@ -8,26 +9,21 @@ import { DotEndpoint } from '@jsplumb/core';
   styleUrls: ['./canvas.component.scss'],
 })
 export class CanvasComponent implements AfterViewInit {
-  @ViewChild('source', { read: ElementRef }) source!: ElementRef;
-  @ViewChild('target', { read: ElementRef }) target!: ElementRef;
+  elements: Element[] = [];
 
-  constructor(private element: ElementRef) {}
+  constructor(
+    private viewContainerRef: ViewContainerRef,
+    private plumbService: PlumbService
+  ) {}
 
   ngAfterViewInit() {
-    const instance = newInstance({
-      container: this.element.nativeElement,
-    });
+    this.plumbService.setContainer(this.viewContainerRef);
+  }
 
-    instance.connect({
-      source: this.source.nativeElement,
-      target: this.target.nativeElement,
-      // connector: StraightConnector.type,
-      endpoint: {
-        type: DotEndpoint.type,
-        options: {
-          radius: 10,
-        },
-      },
-    });
+  addElement() {
+    const element = document.createElement('div');
+    element.id = `${elementPrefix} ${this.elements.length + 1}`;
+    this.elements.push(element);
+    this.plumbService.addElement(element);
   }
 }
