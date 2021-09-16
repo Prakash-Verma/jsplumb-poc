@@ -18,10 +18,9 @@ export class PlumbService {
 
   public setContainer(containerRef: ViewContainerRef) {
     this.containerRef = containerRef;
-    this,
-      (this.jsPlumbInstance = newInstance({
-        container: containerRef.element.nativeElement,
-      }));
+    this.jsPlumbInstance = newInstance({
+      container: containerRef.element.nativeElement,
+    });
   }
 
   public addElement(node: Element) {
