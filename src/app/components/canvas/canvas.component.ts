@@ -1,5 +1,12 @@
-import { Component, ViewChild, ViewContainerRef } from '@angular/core';
+import {
+  Component,
+  ComponentRef,
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core';
 import { PlumbService } from 'src/app/services/plumb.service';
+import { ElementComponent } from '../element/element.component';
+import { GroupComponent } from '../group/group.component';
 
 const elementPrefix = 'Element';
 const groupPrefix = 'Group';
@@ -10,8 +17,8 @@ const groupPrefix = 'Group';
   styleUrls: ['./canvas.component.scss'],
 })
 export class CanvasComponent {
-  private elements: Element[] = [];
-  private groups: Element[] = [];
+  private elements: ComponentRef<ElementComponent>[] = [];
+  private groups: ComponentRef<GroupComponent>[] = [];
 
   @ViewChild('customElements', { static: true, read: ViewContainerRef })
   customElementsContainerRef!: ViewContainerRef;
@@ -23,17 +30,14 @@ export class CanvasComponent {
   }
 
   addElement() {
-    const element = document.createElement('div');
-    element.id = `${elementPrefix} ${this.elements.length + 1}`;
+    const id = `${elementPrefix} ${this.elements.length + 1}`;
+    const element = this.plumbService.addElement(id);
     this.elements.push(element);
-    this.plumbService.addElement(element);
   }
 
   addGroup() {
-    const group = document.createElement('div');
-    group.id = `${groupPrefix} ${this.groups.length + 1}`;
-
+    const id = `${groupPrefix} ${this.groups.length + 1}`;
+    const group = this.plumbService.addGroup(id);
     this.groups.push(group);
-    this.plumbService.addGroup(group);
   }
 }

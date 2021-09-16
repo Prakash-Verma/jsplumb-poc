@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input } from '@angular/core';
 import { BrowserJsPlumbInstance } from '@jsplumb/browser-ui';
 import { EndpointOptions } from '@jsplumb/core';
 
@@ -8,8 +8,10 @@ import { EndpointOptions } from '@jsplumb/core';
   styleUrls: ['./element.component.scss'],
 })
 export class ElementComponent implements AfterViewInit {
-  @Input() element!: Element;
+  @Input() elementId!: string;
   @Input() jsPlumbInstance!: BrowserJsPlumbInstance;
+
+  constructor(public elementRef: ElementRef) {}
 
   ngAfterViewInit() {
     const source: EndpointOptions = {
@@ -32,8 +34,11 @@ export class ElementComponent implements AfterViewInit {
       ],
     };
     this.jsPlumbInstance.addEndpoint(
-      this.element,
-      { anchor: 'Right', uuid: this.element.id + '_right' },
+      this.elementRef.nativeElement.firstChild,
+      {
+        anchor: 'Right',
+        uuid: this.elementId + '_right',
+      },
       source
     );
 
@@ -51,10 +56,9 @@ export class ElementComponent implements AfterViewInit {
     };
 
     this.jsPlumbInstance.addEndpoint(
-      this.element,
-      { anchor: 'Left', uuid: this.element.id + '_left' },
+      this.elementRef.nativeElement.firstChild,
+      { anchor: 'Left', uuid: this.elementId + '_left' },
       target
     );
-    this.jsPlumbInstance.isDraggable(this.element);
   }
 }

@@ -24,7 +24,7 @@ export class PlumbService {
     });
   }
 
-  public addElement(node: Element) {
+  public addElement(elementId: string) {
     if (!this.containerRef) {
       throw new Error('Root container not initialized');
     }
@@ -37,11 +37,12 @@ export class PlumbService {
       this.factoryResolver.resolveComponentFactory(ElementComponent);
     const componentRef =
       this.containerRef.createComponent<ElementComponent>(factory);
-    componentRef.instance.element = node;
+    componentRef.instance.elementId = elementId;
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
+    return componentRef;
   }
 
-  public addGroup(node: any) {
+  public addGroup(elementId: string) {
     if (!this.containerRef) {
       throw new Error('Root container not initialized');
     }
@@ -54,7 +55,8 @@ export class PlumbService {
       this.factoryResolver.resolveComponentFactory(GroupComponent);
     const componentRef =
       this.containerRef.createComponent<GroupComponent>(factory);
-    componentRef.instance.group = node;
+    componentRef.instance.elementId = elementId;
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
+    return componentRef;
   }
 }
