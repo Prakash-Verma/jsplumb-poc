@@ -11,6 +11,7 @@ const groupPrefix = 'Group';
 })
 export class CanvasComponent {
   elements: Element[] = [];
+  groups: Element[] = [];
 
   constructor(private plumbService: PlumbService) {}
 
@@ -21,5 +22,11 @@ export class CanvasComponent {
     this.plumbService.addElement(element);
   }
 
-  addGroup() {}
+  addGroup() {
+    const group = document.createElement('div');
+    group.id = `${groupPrefix} ${this.groups.length + 1}`;
+
+    this.groups.push(group);
+    this.plumbService.addGroup(group);
+  }
 }

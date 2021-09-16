@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
 import { DrawingComponent } from './components/drawing/drawing.component';
 import { ElementComponent } from './components/element/element.component';
+import { GroupComponent } from './components/group/group.component';
 
 @NgModule({
   declarations: [
@@ -13,6 +14,7 @@ import { ElementComponent } from './components/element/element.component';
     CanvasComponent,
     ElementComponent,
     DrawingComponent,
+    GroupComponent,
   ],
   imports: [BrowserModule, AppRoutingModule],
   providers: [],
