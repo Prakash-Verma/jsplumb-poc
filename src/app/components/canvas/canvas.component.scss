@@ -1,0 +1,15 @@
+.commands {
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+
+  button {
+    margin-right: 10px;
+    border-radius: 10px;
+    padding: 5px;
+    width: 125px;
+  }
+  button:last-child {
+    margin-right: 0px;
+  }
+}
