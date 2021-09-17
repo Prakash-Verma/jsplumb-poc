@@ -14,6 +14,11 @@ export class ElementComponent implements AfterViewInit {
   constructor(public elementRef: ElementRef) {}
 
   ngAfterViewInit() {
+    this.addSourceElement();
+    this.addTargetElement();
+  }
+
+  private addSourceElement() {
     const source: EndpointOptions = {
       endpoint: {
         type: 'Dot',
@@ -41,7 +46,9 @@ export class ElementComponent implements AfterViewInit {
       },
       source
     );
+  }
 
+  private addTargetElement() {
     const target: EndpointOptions = {
       endpoint: {
         type: 'Dot',

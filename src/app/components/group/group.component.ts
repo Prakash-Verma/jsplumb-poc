@@ -13,6 +13,10 @@ export class GroupComponent implements AfterViewInit {
   constructor(private elementRef: ElementRef) {}
 
   ngAfterViewInit() {
+    this.addGroupElement();
+  }
+
+  private addGroupElement() {
     this.jsPlumbInstance.addGroup({
       el: this.elementRef.nativeElement,
       id: this.elementId,
