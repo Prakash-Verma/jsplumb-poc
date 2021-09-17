@@ -1,5 +1,6 @@
 import {
   ComponentFactoryResolver,
+  ElementRef,
   Injectable,
   ViewContainerRef,
 } from '@angular/core';
@@ -17,11 +18,14 @@ export class PlumbService {
 
   constructor(private factoryResolver: ComponentFactoryResolver) {}
 
+  public initializeJsInstance(rootElementRef: ElementRef) {
+    this.jsPlumbInstance = newInstance({
+      container: rootElementRef.nativeElement,
+    });
+  }
+
   public setContainer(containerRef: ViewContainerRef) {
     this.containerRef = containerRef;
-    this.jsPlumbInstance = newInstance({
-      container: containerRef.element.nativeElement,
-    });
   }
 
   public addElement(elementId: string) {

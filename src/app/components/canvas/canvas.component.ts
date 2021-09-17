@@ -1,10 +1,12 @@
 import {
   Component,
   ComponentRef,
+  ElementRef,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import { PlumbService } from 'src/app/services/plumb.service';
+
 import { ElementComponent } from '../element/element.component';
 import { GroupComponent } from '../group/group.component';
 
@@ -23,9 +25,13 @@ export class CanvasComponent {
   @ViewChild('customElements', { static: true, read: ViewContainerRef })
   customElementsContainerRef!: ViewContainerRef;
 
-  constructor(private plumbService: PlumbService) {}
+  constructor(
+    private elementRef: ElementRef,
+    private plumbService: PlumbService
+  ) {}
 
   ngAfterViewInit() {
+    this.plumbService.initializeJsInstance(this.elementRef);
     this.plumbService.setContainer(this.customElementsContainerRef);
   }
 

@@ -14,7 +14,7 @@ export class GroupComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.jsPlumbInstance.addGroup({
-      el: this.elementRef.nativeElement.firstChild,
+      el: this.elementRef.nativeElement,
       id: this.elementId,
       droppable: true,
     });

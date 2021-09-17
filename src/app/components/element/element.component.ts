@@ -34,7 +34,7 @@ export class ElementComponent implements AfterViewInit {
       ],
     };
     this.jsPlumbInstance.addEndpoint(
-      this.elementRef.nativeElement.firstChild,
+      this.elementRef.nativeElement,
       {
         anchor: 'Right',
         uuid: this.elementId + '_right',
@@ -56,7 +56,7 @@ export class ElementComponent implements AfterViewInit {
     };
 
     this.jsPlumbInstance.addEndpoint(
-      this.elementRef.nativeElement.firstChild,
+      this.elementRef.nativeElement,
       { anchor: 'Left', uuid: this.elementId + '_left' },
       target
     );
