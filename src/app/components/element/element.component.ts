@@ -26,17 +26,6 @@ export class ElementComponent implements AfterViewInit {
       },
       paintStyle: { fill: 'blue' },
       source: true,
-      connector: { type: 'Flowchart', options: { cornerRadius: 4 } },
-      connectorOverlays: [
-        {
-          type: 'PlainArrow',
-          options: {
-            location: 1,
-            width: 6,
-            length: 6,
-          },
-        },
-      ],
     };
     this.jsPlumbInstance.addEndpoint(
       this.elementRef.nativeElement,
