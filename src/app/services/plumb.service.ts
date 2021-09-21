@@ -11,9 +11,7 @@ import { PointXY } from '@jsplumb/util';
 import { ElementComponent } from '../components/element/element.component';
 import { GroupComponent } from '../components/group/group.component';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class PlumbService {
   private containerRef: ViewContainerRef | undefined;
   jsPlumbInstance: BrowserJsPlumbInstance | undefined;

@@ -5,8 +5,8 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { PlumbService } from 'src/app/services/plumb.service';
 
+import { PlumbService } from '../../services/plumb.service';
 import { ElementComponent } from '../element/element.component';
 import { GroupComponent } from '../group/group.component';
 

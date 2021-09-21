@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
 import { ElementComponent } from './components/element/element.component';
 import { GroupComponent } from './components/group/group.component';
+import { PlumbService } from './services/plumb.service';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,7 @@ import { GroupComponent } from './components/group/group.component';
     GroupComponent,
   ],
   imports: [BrowserModule, AppRoutingModule],
-  providers: [],
+  providers: [PlumbService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

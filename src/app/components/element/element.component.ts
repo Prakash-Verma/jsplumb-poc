@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input } from '@angular/core';
 import { BrowserJsPlumbInstance } from '@jsplumb/browser-ui';
+import { FlowchartConnector } from '@jsplumb/connector-flowchart';
 import { EndpointOptions } from '@jsplumb/core';
 
 @Component({
@@ -23,6 +24,8 @@ export class ElementComponent implements AfterViewInit {
       endpoint: 'Dot',
       paintStyle: { fill: 'blue' },
       source: true,
+      connector: FlowchartConnector.type,
+      maxConnections: 10,
     };
     this.jsPlumbInstance.addEndpoint(
       this.elementRef.nativeElement,
@@ -40,6 +43,7 @@ export class ElementComponent implements AfterViewInit {
       paintStyle: { fill: 'blue' },
       target: true,
       maxConnections: 10,
+      connector: FlowchartConnector.type,
     };
 
     this.jsPlumbInstance.addEndpoint(
