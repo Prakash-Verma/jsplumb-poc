@@ -145,9 +145,8 @@ function calculatePosition(
     sourceGroup?: UIGroup<any> | undefined;
   }
 ) {
-  const left = (groupEle.offsetWidth - element.offsetWidth) / 2; // + 'px';
+  const left = (groupEle.offsetWidth - element.offsetWidth) / 2;
 
-  // element.style.left = left + 'px';
   let totalOffset = 0;
   let count = 1;
   for (let index = 0; index < params.group.children.length - 1; ++index) {
@@ -156,7 +155,7 @@ function calculatePosition(
     ++count;
   }
 
-  const top = totalOffset + count * 5; // + 'px';
+  const top = totalOffset + count * 5;
 
   return { x: left, y: top };
 }
