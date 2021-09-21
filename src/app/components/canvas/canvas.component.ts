@@ -24,14 +24,12 @@ export class CanvasComponent {
 
   @ViewChild('customElements', { static: true, read: ViewContainerRef })
   customElementsContainerRef!: ViewContainerRef;
+  @ViewChild('container') containerRef!: ElementRef;
 
-  constructor(
-    private elementRef: ElementRef,
-    private plumbService: PlumbService
-  ) {}
+  constructor(private plumbService: PlumbService) {}
 
   ngAfterViewInit() {
-    this.plumbService.initializeJsInstance(this.elementRef);
+    this.plumbService.initializeJsInstance(this.containerRef);
     this.plumbService.setContainer(this.customElementsContainerRef);
   }
 
