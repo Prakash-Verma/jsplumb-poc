@@ -1,5 +1,4 @@
 import {
-  ApplicationRef,
   ComponentFactoryResolver,
   ElementRef,
   Injectable,
@@ -19,10 +18,7 @@ export class PlumbService {
   private containerRef: ViewContainerRef | undefined;
   jsPlumbInstance: BrowserJsPlumbInstance | undefined;
 
-  constructor(
-    private factoryResolver: ComponentFactoryResolver,
-    private cd: ApplicationRef
-  ) {}
+  constructor(private factoryResolver: ComponentFactoryResolver) {}
 
   public initializeJsInstance(rootElementRef: ElementRef) {
     this.jsPlumbInstance = newInstance({
@@ -80,77 +76,65 @@ export class PlumbService {
     this.jsPlumbInstance.bind(
       EVENT_GROUP_MEMBER_ADDED,
       (params: {
-        group: UIGroup;
-        el: any;
+        group: UIGroup<HTMLElement>;
+        el: HTMLElement;
         pos: PointXY;
-        sourceGroup?: UIGroup;
       }) => {
-        const element = params.el;
-        const currentGroup = params.group;
-        this.adjustGroupWidth(element, currentGroup);
-        this.setElementPositionInGroup(currentGroup, element, params);
-        this.adjustGroupHeight(element, currentGroup);
-        params.group.instance.repaintEverything();
-
-        this.jsPlumbInstance?.setSuspendDrawing(false, true);
-        this.cd.tick();
+        this.adjustPositionAndUI(params.el, params.group);
+        setTimeout(() => {
+          this.jsPlumbInstance?.repaint(params.group.el);
+        }, 0);
       }
     );
   }
 
-  private adjustGroupWidth(element: any, currentGroup: UIGroup<any>) {
+  private adjustPositionAndUI(
+    element: HTMLElement,
+    group: UIGroup<HTMLElement>
+  ) {
+    this.adjustGroupWidth(group);
+    this.setElementPositionInGroup(group, element);
+    this.adjustGroupHeight(element, group.el);
+  }
+
+  private adjustGroupWidth(group: UIGroup<HTMLElement>) {
     let maxWidth = 0;
-    currentGroup.children.forEach((child) => {
+    group.children.forEach((child) => {
       if (child.el.offsetWidth > maxWidth) {
         maxWidth = child.el.offsetWidth;
       }
     });
 
-    if (currentGroup.el.offsetWidth < maxWidth + 10) {
-      currentGroup.el.style.width = maxWidth + 10 + 'px';
+    if (group.el.offsetWidth < maxWidth + 10) {
+      group.el.style.width = maxWidth + 10 + 'px';
     }
   }
 
-  private adjustGroupHeight(element: any, currentGroup: UIGroup<any>) {
+  private adjustGroupHeight(element: HTMLElement, groupEle: HTMLElement) {
     const bottomSpace = parseInt(
       getComputedStyle(element).bottom.replace('px', '')
     );
     if (bottomSpace <= 0) {
-      currentGroup.el.style.height =
-        currentGroup.el.offsetHeight + Math.abs(bottomSpace) + 'px';
+      groupEle.style.height =
+        groupEle.offsetHeight + Math.abs(bottomSpace) + 'px';
     }
   }
 
   private setElementPositionInGroup(
-    currentGroup: UIGroup<any>,
-    element: any,
-    params: {
-      group: UIGroup;
-      el: any;
-      pos: PointXY;
-      sourceGroup?: UIGroup<any> | undefined;
-    }
+    group: UIGroup<HTMLElement>,
+    element: HTMLElement
   ) {
-    const position = calculatePosition(currentGroup.el, element, params);
+    const position = calculatePosition(group, element);
     this.jsPlumbInstance?.setPosition(element, position);
   }
 }
-function calculatePosition(
-  groupEle: any,
-  element: any,
-  params: {
-    group: UIGroup;
-    el: any;
-    pos: PointXY;
-    sourceGroup?: UIGroup<any> | undefined;
-  }
-) {
-  const left = (groupEle.offsetWidth - element.offsetWidth) / 2;
+function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
+  const left = (group.el.offsetWidth - element.offsetWidth) / 2;
 
   let totalOffset = 0;
   let count = 1;
-  for (let index = 0; index < params.group.children.length - 1; ++index) {
-    const child = params.group.children[index];
+  for (let index = 0; index < group.children.length - 1; ++index) {
+    const child = group.children[index];
     totalOffset += child.el.offsetHeight;
     ++count;
   }
