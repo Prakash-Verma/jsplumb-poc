@@ -24,7 +24,8 @@ export class GroupComponent implements AfterViewInit {
       el: this.elementRef.nativeElement,
       id: this.elementId,
       droppable: true,
-      constrain: true,
+      constrain: false,
+      revert: false,
     });
   }
 
