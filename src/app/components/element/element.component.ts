@@ -20,10 +20,7 @@ export class ElementComponent implements AfterViewInit {
 
   private addSourceElement() {
     const source: EndpointOptions = {
-      endpoint: {
-        type: 'Dot',
-        options: { radius: 3 },
-      },
+      endpoint: 'Dot',
       paintStyle: { fill: 'blue' },
       source: true,
     };
@@ -39,13 +36,7 @@ export class ElementComponent implements AfterViewInit {
 
   private addTargetElement() {
     const target: EndpointOptions = {
-      endpoint: {
-        type: 'Dot',
-        options: {
-          radius: 3,
-          cssClass: 'target-connection',
-        },
-      },
+      endpoint: 'Dot',
       paintStyle: { fill: 'blue' },
       target: true,
       maxConnections: 10,
