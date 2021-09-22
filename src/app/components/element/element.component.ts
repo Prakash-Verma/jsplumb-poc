@@ -26,6 +26,8 @@ export class ElementComponent implements AfterViewInit {
       source: true,
       connector: FlowchartConnector.type,
       maxConnections: 10,
+      connectorStyle: { stroke: '#99cb3a', strokeWidth: 2 },
+      connectorOverlays: [{ type: 'Arrow', options: { location: 1 } }],
     };
     this.jsPlumbInstance.addEndpoint(
       this.elementRef.nativeElement,
