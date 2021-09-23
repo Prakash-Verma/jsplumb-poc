@@ -5,7 +5,12 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { BrowserJsPlumbInstance, newInstance } from '@jsplumb/browser-ui';
-import { EVENT_GROUP_MEMBER_ADDED, UIGroup } from '@jsplumb/core';
+import { FlowchartConnector } from '@jsplumb/connector-flowchart';
+import {
+  EndpointOptions,
+  EVENT_GROUP_MEMBER_ADDED,
+  UIGroup,
+} from '@jsplumb/core';
 import { PointXY } from '@jsplumb/util';
 
 import { ElementComponent } from '../components/element/element.component';
@@ -15,12 +20,12 @@ import { GroupComponent } from '../components/group/group.component';
 export class PlumbService {
   private containerRef: ViewContainerRef | undefined;
   jsPlumbInstance: BrowserJsPlumbInstance | undefined;
-
   constructor(private factoryResolver: ComponentFactoryResolver) {}
 
   public initializeJsInstance(rootElementRef: ElementRef) {
     this.jsPlumbInstance = newInstance({
       container: rootElementRef.nativeElement,
+      connector: FlowchartConnector.type,
     });
 
     this.setHandlers();
@@ -125,7 +130,42 @@ export class PlumbService {
     const position = calculatePosition(group, element);
     this.jsPlumbInstance?.setPosition(element, position);
   }
+
+  public addSourceElement(nativeElement: HTMLElement) {
+    const source: EndpointOptions = {
+      endpoint: 'Dot',
+      paintStyle: { fill: 'blue' },
+      source: true,
+      connectorStyle: { stroke: '#99cb3a', strokeWidth: 2 },
+      connectorOverlays: [{ type: 'Arrow', options: { location: 1 } }],
+    };
+    this.jsPlumbInstance?.addEndpoint(
+      nativeElement,
+      {
+        anchor: 'Right',
+      },
+      source
+    );
+  }
+
+  public addTargetElement(nativeElement: HTMLElement) {
+    const target: EndpointOptions = {
+      endpoint: {
+        type: 'Dot',
+        options: { radius: 5 },
+      },
+      paintStyle: { fill: 'blue' },
+      target: true,
+    };
+
+    this.jsPlumbInstance?.addEndpoint(
+      nativeElement,
+      { anchor: 'Left' },
+      target
+    );
+  }
 }
+
 function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
   const left = (group.el.offsetWidth - element.offsetWidth) / 2;
 

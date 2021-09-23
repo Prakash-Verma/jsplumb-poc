@@ -1,6 +1,8 @@
 import { AfterViewInit, Component, ElementRef, Input } from '@angular/core';
 import { BrowserJsPlumbInstance } from '@jsplumb/browser-ui';
-import { EndpointOptions } from '@jsplumb/core';
+
+import { PlumbService } from '../../services/plumb.service';
+
 @Component({
   selector: 'app-group',
   templateUrl: './group.component.html',
@@ -9,14 +11,19 @@ import { EndpointOptions } from '@jsplumb/core';
 export class GroupComponent implements AfterViewInit {
   @Input() elementId!: string;
   @Input() jsPlumbInstance!: BrowserJsPlumbInstance;
-  @Input() sourceGroup!: ElementRef;
+  @Input() needSource = false;
+  @Input() needTarget = true;
 
-  constructor(public elementRef: ElementRef) {}
+  constructor(
+    public elementRef: ElementRef,
+    private plumbService: PlumbService
+  ) {}
 
   ngAfterViewInit() {
     this.addGroupElement();
-    this.addSourceElement();
-    this.addTargetElement();
+
+    this.addSource();
+    this.addTarget();
   }
 
   private addGroupElement() {
@@ -29,43 +36,17 @@ export class GroupComponent implements AfterViewInit {
     });
   }
 
-  private addSourceElement() {
-    const source: EndpointOptions = {
-      endpoint: {
-        type: 'Dot',
-        options: { radius: 5 },
-      },
-      paintStyle: { fill: 'blue' },
-      source: true,
-    };
-    this.jsPlumbInstance.addEndpoint(
-      this.elementRef.nativeElement,
-      {
-        anchor: 'Right',
-        uuid: this.elementId + '_right',
-      },
-      source
-    );
+  private addSource() {
+    if (!this.needSource) {
+      return;
+    }
+    this.plumbService.addSourceElement(this.elementRef.nativeElement);
   }
 
-  private addTargetElement() {
-    const target: EndpointOptions = {
-      endpoint: {
-        type: 'Dot',
-        options: {
-          radius: 5,
-          cssClass: 'target-connection',
-        },
-      },
-      paintStyle: { fill: 'blue' },
-      target: true,
-      maxConnections: 10,
-    };
-
-    this.jsPlumbInstance.addEndpoint(
-      this.elementRef.nativeElement,
-      { anchor: 'AutoDefault', uuid: this.elementId + '_left' },
-      target
-    );
+  private addTarget() {
+    if (!this.needTarget) {
+      return;
+    }
+    this.plumbService.addTargetElement(this.elementRef.nativeElement);
   }
 }
