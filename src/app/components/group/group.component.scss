@@ -1,9 +1,26 @@
 :host {
   position: absolute;
-  padding: 4px 12px;
-  border-radius: 14px;
+  border-radius: 4px;
   border: 1px solid blue;
-  text-align: center;
-  height: 150px;
-  width: 150px;
+  min-height: 50px;
+}
+
+.group-content {
+  display: flex;
+
+  .left-bar {
+    background-color: #efefef;
+    border-radius: 4px 0 0 0;
+    img {
+      width: 25px;
+    }
+  }
+
+  .inner-content {
+    font-size: 12px;
+    padding: 0 10px;
+    p {
+      margin-top: 5px;
+    }
+  }
 }

@@ -53,7 +53,7 @@ export class PlumbService {
     return componentRef;
   }
 
-  public addGroup(elementId: string) {
+  public addGroup(elementId: string, isFirstElement: boolean) {
     if (!this.containerRef) {
       throw new Error('Root container not initialized');
     }
@@ -68,6 +68,8 @@ export class PlumbService {
       this.containerRef.createComponent<GroupComponent>(factory);
     componentRef.instance.elementId = elementId;
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
+    componentRef.instance.needSource = isFirstElement;
+    componentRef.instance.needTarget = !isFirstElement;
     return componentRef;
   }
 
@@ -119,7 +121,7 @@ export class PlumbService {
     );
     if (bottomSpace <= 0) {
       groupEle.style.height =
-        groupEle.offsetHeight + Math.abs(bottomSpace) + 'px';
+        groupEle.offsetHeight + 10 + Math.abs(bottomSpace) + 'px';
     }
   }
 
@@ -177,7 +179,7 @@ function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
     ++count;
   }
 
-  const top = totalOffset + count * 5;
+  const top = totalOffset + 50 + count * 5;
 
   return { x: left, y: top };
 }

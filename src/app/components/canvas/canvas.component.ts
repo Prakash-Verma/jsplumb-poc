@@ -26,6 +26,7 @@ export class CanvasComponent {
   customElementsContainerRef!: ViewContainerRef;
   @ViewChild('container') containerRef!: ElementRef;
 
+  firstGroupGenerated = false;
   constructor(private plumbService: PlumbService) {}
 
   ngAfterViewInit() {
@@ -41,7 +42,8 @@ export class CanvasComponent {
 
   addGroup() {
     const id = `${groupPrefix} ${this.groups.length + 1}`;
-    const group = this.plumbService.addGroup(id);
+    const group = this.plumbService.addGroup(id, !this.firstGroupGenerated);
     this.groups.push(group);
+    this.firstGroupGenerated = true;
   }
 }
