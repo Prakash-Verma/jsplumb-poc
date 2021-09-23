@@ -18,8 +18,28 @@ import { GroupComponent } from '../components/group/group.component';
 
 @Injectable()
 export class PlumbService {
-  private containerRef: ViewContainerRef | undefined;
-  jsPlumbInstance: BrowserJsPlumbInstance | undefined;
+  private _containerRef: ViewContainerRef | undefined;
+  get containerRef() {
+    if (!this._containerRef) {
+      throw new Error('Root container not initialized');
+    }
+    return this._containerRef;
+  }
+  set containerRef(value: ViewContainerRef) {
+    this._containerRef = value;
+  }
+
+  private _jsPlumbInstance: BrowserJsPlumbInstance | undefined;
+  get jsPlumbInstance() {
+    if (!this._jsPlumbInstance) {
+      throw new Error('jsPlumbInstance is not yet set');
+    }
+    return this._jsPlumbInstance;
+  }
+  set jsPlumbInstance(value: BrowserJsPlumbInstance) {
+    this._jsPlumbInstance = value;
+  }
+
   constructor(private factoryResolver: ComponentFactoryResolver) {}
 
   public initializeJsInstance(rootElementRef: ElementRef) {
@@ -36,14 +56,6 @@ export class PlumbService {
   }
 
   public addElement(elementId: string) {
-    if (!this.containerRef) {
-      throw new Error('Root container not initialized');
-    }
-
-    if (!this.jsPlumbInstance) {
-      throw new Error('jsPlumbInstance is not yet set');
-    }
-
     const factory =
       this.factoryResolver.resolveComponentFactory(ElementComponent);
     const componentRef =
@@ -54,14 +66,6 @@ export class PlumbService {
   }
 
   public addGroup(elementId: string, isFirstElement: boolean) {
-    if (!this.containerRef) {
-      throw new Error('Root container not initialized');
-    }
-
-    if (!this.jsPlumbInstance) {
-      throw new Error('jsPlumbInstance is not yet set');
-    }
-
     const factory =
       this.factoryResolver.resolveComponentFactory(GroupComponent);
     const componentRef =
@@ -74,10 +78,6 @@ export class PlumbService {
   }
 
   private setHandlers() {
-    if (!this.jsPlumbInstance) {
-      throw new Error('jsPlumbInstance is not yet set');
-    }
-
     this.jsPlumbInstance.bind(
       EVENT_GROUP_MEMBER_ADDED,
       (params: {
@@ -87,7 +87,7 @@ export class PlumbService {
       }) => {
         this.adjustPositionAndUI(params.el, params.group);
         setTimeout(() => {
-          this.jsPlumbInstance?.repaint(params.group.el);
+          this.jsPlumbInstance.repaint(params.group.el);
         }, 0);
       }
     );
@@ -130,7 +130,7 @@ export class PlumbService {
     element: HTMLElement
   ) {
     const position = calculatePosition(group, element);
-    this.jsPlumbInstance?.setPosition(element, position);
+    this.jsPlumbInstance.setPosition(element, position);
   }
 
   public addSourceElement(nativeElement: HTMLElement) {
@@ -141,7 +141,7 @@ export class PlumbService {
       connectorStyle: { stroke: '#99cb3a', strokeWidth: 2 },
       connectorOverlays: [{ type: 'Arrow', options: { location: 1 } }],
     };
-    this.jsPlumbInstance?.addEndpoint(
+    this.jsPlumbInstance.addEndpoint(
       nativeElement,
       {
         anchor: 'Right',
@@ -160,11 +160,7 @@ export class PlumbService {
       target: true,
     };
 
-    this.jsPlumbInstance?.addEndpoint(
-      nativeElement,
-      { anchor: 'Left' },
-      target
-    );
+    this.jsPlumbInstance.addEndpoint(nativeElement, { anchor: 'Left' }, target);
   }
 }
 
