@@ -4,7 +4,11 @@ import {
   Injectable,
   ViewContainerRef,
 } from '@angular/core';
-import { BrowserJsPlumbInstance, newInstance } from '@jsplumb/browser-ui';
+import {
+  BrowserJsPlumbInstance,
+  EVENT_ELEMENT_CLICK,
+  newInstance,
+} from '@jsplumb/browser-ui';
 import { FlowchartConnector } from '@jsplumb/connector-flowchart';
 import {
   EndpointOptions,
@@ -87,10 +91,18 @@ export class PlumbService {
       }) => {
         this.adjustPositionAndUI(params.el, params.group);
         setTimeout(() => {
-          this.jsPlumbInstance.repaint(params.group.el);
+          // this.jsPlumbInstance.repaint(params.group.el);
+          this.jsPlumbInstance.repaintEverything();
         }, 0);
       }
     );
+
+    this.jsPlumbInstance.bind(EVENT_ELEMENT_CLICK, (element: HTMLElement) => {
+      const group = this.jsPlumbInstance.getGroupFor(element);
+      if (group) {
+        this.jsPlumbInstance.repaintEverything();
+      }
+    });
   }
 
   private adjustPositionAndUI(
