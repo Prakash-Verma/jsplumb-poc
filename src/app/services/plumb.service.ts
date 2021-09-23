@@ -152,7 +152,7 @@ export class PlumbService {
       paintStyle: { fill: 'blue' },
       source: true,
       connectorStyle: { stroke: '#99cb3a', strokeWidth: 2 },
-      connectorOverlays: [{ type: 'Arrow', options: { location: 1 } }],
+      connectorOverlays: [{ type: 'PlainArrow', options: { location: 1 } }],
     };
     this.jsPlumbInstance.addEndpoint(
       nativeElement,
