@@ -98,8 +98,9 @@ export class PlumbService {
     );
 
     this.jsPlumbInstance.bind(EVENT_ELEMENT_CLICK, (element: HTMLElement) => {
-      const group = this.jsPlumbInstance.getGroupFor(element);
-      if (group) {
+      const groupOfEle = this.jsPlumbInstance.getGroupFor(element);
+      const isGroup = element.id.includes('Group');
+      if (groupOfEle || isGroup) {
         this.jsPlumbInstance.repaintEverything();
       }
     });

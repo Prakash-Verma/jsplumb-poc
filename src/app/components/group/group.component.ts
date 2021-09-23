@@ -20,6 +20,7 @@ export class GroupComponent implements AfterViewInit {
   ) {}
 
   ngAfterViewInit() {
+    this.elementRef.nativeElement.id = this.elementId;
     this.addGroupElement();
 
     this.addSource();
