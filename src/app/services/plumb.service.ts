@@ -49,7 +49,7 @@ export class PlumbService {
   public initializeJsInstance(rootElementRef: ElementRef) {
     this.jsPlumbInstance = newInstance({
       container: rootElementRef.nativeElement,
-      connector: FlowchartConnector.type,
+      connector: { type: FlowchartConnector.type, options: { gap: 5 } },
     });
 
     this.setHandlers();
@@ -149,10 +149,12 @@ export class PlumbService {
   public addSourceElement(nativeElement: HTMLElement) {
     const source: EndpointOptions = {
       endpoint: 'Dot',
-      paintStyle: { fill: 'blue' },
+      paintStyle: { fill: '#fff', stroke: '#b731a9' },
       source: true,
-      connectorStyle: { stroke: '#99cb3a', strokeWidth: 2 },
-      connectorOverlays: [{ type: 'PlainArrow', options: { location: 1 } }],
+      connectorStyle: { stroke: '#b731a9', strokeWidth: 1 },
+      connectorOverlays: [
+        { type: 'PlainArrow', options: { location: 1, width: 12, length: 10 } },
+      ],
     };
     this.jsPlumbInstance.addEndpoint(
       nativeElement,
@@ -169,7 +171,7 @@ export class PlumbService {
         type: 'Dot',
         options: { radius: 5 },
       },
-      paintStyle: { fill: 'blue' },
+      paintStyle: { stroke: '#b731a9', fill: '#fff' },
       target: true,
     };
 
