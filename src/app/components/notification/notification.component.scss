@@ -1,0 +1,29 @@
+.msg {
+  animation-duration: 1s;
+  animation-name: slide-in;
+
+  position: absolute;
+  right: 0;
+
+  .msg-box {
+    width: 290px;
+    border-radius: 15px 0 0 15px;
+    background-color: lightgray;
+    padding: 5px 0 0 10px;
+    font-size: 1rem;
+    border-bottom: 2px solid red;
+    font-weight: 600;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    margin-left: 0%;
+    width: 10%;
+  }
+
+  to {
+    margin-left: 100%;
+    width: 302px;
+  }
+}
