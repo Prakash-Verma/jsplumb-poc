@@ -177,6 +177,53 @@ export class PlumbService {
 
     this.jsPlumbInstance.addEndpoint(nativeElement, { anchor: 'Left' }, target);
   }
+
+  public createAndSaveJson(plumbGroups: PlumbGroup[], plumbNodes: PlumbNode[]) {
+    const plumbJson = {
+      groups: plumbGroups,
+      nodes: plumbNodes,
+    };
+    console.log('plumbJson: ', plumbJson);
+    localStorage.setItem('plumbJson', JSON.stringify(plumbJson));
+  }
+
+  recreate() {
+    const plumbCookie = localStorage.getItem('plumbJson');
+    if (!plumbCookie) {
+      alert('Please save a diagram first!!!');
+      return;
+    }
+
+    const jsonObj = <PlumbJson>JSON.parse(plumbCookie);
+    console.log('plumbJson', jsonObj);
+
+    const nodes = jsonObj.nodes.map((node) => this.addElement(node.id));
+
+    const groups = jsonObj.groups.map((group, index) => {
+      const component = this.addGroup(group.id, index === 0);
+      component.location.nativeElement.style.left =
+        group.style.offsetLeft + 'px';
+      component.location.nativeElement.style.top = group.style.offsetTop + 'px';
+
+      setTimeout(() => {
+        this.addNodesToGroup(this.jsPlumbInstance, group);
+      }, 0);
+      return component;
+    });
+
+    return { groups, nodes };
+  }
+
+  private addNodesToGroup(
+    jsPlumbInstance: BrowserJsPlumbInstance,
+    group: PlumbGroup
+  ) {
+    const uiGroup = jsPlumbInstance.getGroup(group.id);
+    const uiNodes = group.children.map((child) =>
+      jsPlumbInstance.getManagedElement(child)
+    );
+    jsPlumbInstance.addToGroup(uiGroup, ...uiNodes);
+  }
 }
 
 function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
@@ -193,4 +240,21 @@ function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
   const top = totalOffset + 50 + count * 5;
 
   return { x: left, y: top };
+}
+
+export interface PlumbNode {
+  id: string;
+  style: {
+    offsetLeft: number;
+    offsetTop: number;
+  };
+}
+
+export interface PlumbGroup extends PlumbNode {
+  children: string[];
+}
+
+interface PlumbJson {
+  groups: PlumbGroup[];
+  nodes: PlumbNode[];
 }
