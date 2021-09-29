@@ -19,6 +19,7 @@ import { PointXY } from '@jsplumb/util';
 
 import { ElementComponent } from '../components/element/element.component';
 import { GroupComponent } from '../components/group/group.component';
+import { NotificationService } from '../components/notification/notification.service';
 
 @Injectable()
 export class PlumbService {
@@ -44,7 +45,10 @@ export class PlumbService {
     this._jsPlumbInstance = value;
   }
 
-  constructor(private factoryResolver: ComponentFactoryResolver) {}
+  constructor(
+    private factoryResolver: ComponentFactoryResolver,
+    private notification: NotificationService
+  ) {}
 
   public initializeJsInstance(rootElementRef: ElementRef) {
     this.jsPlumbInstance = newInstance({
@@ -197,6 +201,14 @@ export class PlumbService {
     const jsonObj = <PlumbJson>JSON.parse(plumbCookie);
     console.log('plumbJson', jsonObj);
 
+    const isDirtyCanvas = isDirtyCanvasFn(jsonObj);
+    if (isDirtyCanvas) {
+      this.notification.show(
+        'Canvas is not clean please clear and then recreate!!!'
+      );
+      return;
+    }
+
     const nodes = jsonObj.nodes.map((node) => this.addElement(node.id));
 
     const groups = jsonObj.groups.map((group, index) => {
@@ -224,6 +236,19 @@ export class PlumbService {
     );
     jsPlumbInstance.addToGroup(uiGroup, ...uiNodes);
   }
+}
+
+function isDirtyCanvasFn(jsonObj: PlumbJson) {
+  const hasGroup = jsonObj.groups.some((group) => {
+    return document.getElementById(group.id);
+  });
+  if (hasGroup) {
+    return true;
+  }
+  const hasElement = jsonObj.nodes.some((node) => {
+    return document.getElementById(node.id);
+  });
+  return hasElement;
 }
 
 function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
