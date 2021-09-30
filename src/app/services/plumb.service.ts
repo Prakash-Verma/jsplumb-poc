@@ -183,12 +183,24 @@ export class PlumbService {
   }
 
   public createAndSaveJson(plumbGroups: PlumbGroup[], plumbNodes: PlumbNode[]) {
+    const plumbConnections = this.getConnections();
     const plumbJson = {
       groups: plumbGroups,
       nodes: plumbNodes,
+      connections: plumbConnections,
     };
     console.log('plumbJson: ', plumbJson);
     localStorage.setItem('plumbJson', JSON.stringify(plumbJson));
+  }
+
+  private getConnections(): PlumbConnection[] {
+    return this.jsPlumbInstance.connections.map((conn) => {
+      return {
+        connectionId: conn.id,
+        source: { id: conn.source.id, isGroup: conn.source._isJsPlumbGroup },
+        target: { id: conn.target.id, isGroup: conn.target._isJsPlumbGroup },
+      };
+    });
   }
 
   recreate() {
@@ -209,6 +221,10 @@ export class PlumbService {
       return;
     }
 
+    this.jsPlumbInstance.setSuspendDrawing(true);
+    const container = <HTMLElement>this.jsPlumbInstance.getContainer();
+    container.style.opacity = '0';
+
     const nodes = jsonObj.nodes.map((node) => this.addElement(node.id));
 
     const groups = jsonObj.groups.map((group, index) => {
@@ -223,7 +239,40 @@ export class PlumbService {
       return component;
     });
 
+    setTimeout(() => {
+      this.createConnections(jsonObj, this.jsPlumbInstance);
+
+      container.style.opacity = '1';
+      this.jsPlumbInstance.setSuspendDrawing(false);
+    }, 0);
+
     return { groups, nodes };
+  }
+
+  private createConnections(
+    jsonObj: PlumbJson,
+    jsPlumbInstance: BrowserJsPlumbInstance
+  ) {
+    jsonObj.connections.forEach((conn) => {
+      const srcEndpoint = getEndpointForConnection(
+        conn.source.id,
+        conn.source.isGroup,
+        true,
+        jsPlumbInstance
+      );
+      const targetEndpoint = getEndpointForConnection(
+        conn.target.id,
+        conn.target.isGroup,
+        false,
+        jsPlumbInstance
+      );
+      if (srcEndpoint && targetEndpoint) {
+        jsPlumbInstance.connect({
+          source: srcEndpoint,
+          target: targetEndpoint,
+        });
+      }
+    });
   }
 
   private addNodesToGroup(
@@ -249,6 +298,19 @@ function isDirtyCanvasFn(jsonObj: PlumbJson) {
     return document.getElementById(node.id);
   });
   return hasElement;
+}
+
+function getEndpointForConnection(
+  elId: string,
+  isGroup: boolean,
+  isSource: boolean,
+  jsPlumbInstance: BrowserJsPlumbInstance
+) {
+  const ele = isGroup
+    ? jsPlumbInstance.getGroup(elId).el
+    : jsPlumbInstance.getManagedElement(elId);
+  const endpoints = jsPlumbInstance.getEndpoints(ele);
+  return endpoints.find((ep) => (isSource ? ep.isSource : ep.isTarget));
 }
 
 function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
@@ -279,7 +341,14 @@ export interface PlumbGroup extends PlumbNode {
   children: string[];
 }
 
+interface PlumbConnection {
+  connectionId: string;
+  source: { id: string; isGroup: boolean };
+  target: { id: string; isGroup: boolean };
+}
+
 interface PlumbJson {
   groups: PlumbGroup[];
   nodes: PlumbNode[];
+  connections: PlumbConnection[];
 }
