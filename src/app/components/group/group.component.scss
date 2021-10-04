@@ -6,6 +6,11 @@
   min-width: 237px;
   max-width: 250px;
   display: inline-flex;
+  &:hover {
+    .close {
+      display: block;
+    }
+  }
 }
 
 .group-content {
@@ -26,5 +31,24 @@
     p {
       margin-top: 5px;
     }
+  }
+}
+
+.close {
+  display: none;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border: 1px solid #e1e1e1;
+  border-radius: 37px;
+  width: 15px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  height: 15px;
+  line-height: 13px;
+  background-color: #cdcdcd;
+  &:hover {
+    background-color: #b9b9a0;
   }
 }

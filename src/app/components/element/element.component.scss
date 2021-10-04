@@ -5,4 +5,28 @@
   border: 1px solid #b731a9;
   text-align: center;
   width: 100px;
+  &:hover {
+    .close {
+      display: block;
+    }
+  }
+}
+
+.close {
+  display: none;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border: 2px solid #e1e1e1;
+  border-radius: 37px;
+  padding: 2px;
+  width: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  height: 10px;
+  line-height: 9px;
+  background-color: #cdcdcd;
+  &:hover {
+    background-color: #b9b9a0;
+  }
 }
