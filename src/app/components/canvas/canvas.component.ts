@@ -57,39 +57,64 @@ export class CanvasComponent {
     this.plumbService.createAndSaveJson(plumbGroups, plumbNodes);
   }
 
-  private getPlumbNodes(jsPlumbInstance: BrowserJsPlumbInstance) {
+  private getPlumbNodes(
+    jsPlumbInstance: BrowserJsPlumbInstance,
+    savePosition = true
+  ) {
     return this.elements
       .map((element) => {
         const plumbNode = <HTMLElement>(
           jsPlumbInstance.getManagedElement(element.instance.elementId)
         );
-        return <PlumbNode>{
-          id: element.instance.elementId,
-          style: {
+        const nodeJson = <PlumbNode>{ id: element.instance.elementId };
+
+        if (savePosition) {
+          nodeJson['style'] = {
             offsetLeft: plumbNode.offsetLeft,
             offsetTop: plumbNode.offsetTop,
-          },
-        };
+          };
+        }
+        return nodeJson;
       })
       .filter(Boolean);
   }
 
-  private getPlumbGroups(jsPlumbInstance: BrowserJsPlumbInstance) {
+  private getPlumbGroups(
+    jsPlumbInstance: BrowserJsPlumbInstance,
+    savePosition = true
+  ) {
     return this.groups
       .map((group) => {
         const plumbGroup = jsPlumbInstance.getGroup(group.instance.elementId);
         const groupEle = <HTMLElement>plumbGroup.el;
 
-        return <PlumbGroup>{
+        const groupJson = <PlumbGroup>{
           id: group.instance.elementId,
-          style: {
-            offsetLeft: groupEle.offsetLeft,
-            offsetTop: groupEle.offsetTop,
-          },
           children: plumbGroup?.children.map((child) => child.el.id),
         };
+
+        if (savePosition) {
+          groupJson['style'] = {
+            offsetLeft: groupEle.offsetLeft,
+            offsetTop: groupEle.offsetTop,
+          };
+        }
+        return groupJson;
       })
       .filter(Boolean);
+  }
+
+  saveJsGramNodeOnly() {
+    const plumbGroups = this.getPlumbGroups(
+      this.plumbService.jsPlumbInstance,
+      false
+    );
+    const plumbNodes = this.getPlumbNodes(
+      this.plumbService.jsPlumbInstance,
+      false
+    );
+
+    this.plumbService.createAndSaveJson(plumbGroups, plumbNodes);
   }
 
   clear() {

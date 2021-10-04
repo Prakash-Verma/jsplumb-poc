@@ -227,11 +227,21 @@ export class PlumbService {
 
     const nodes = jsonObj.nodes.map((node) => this.addElement(node.id));
 
+    let offsetLeft = 20;
+    const offsetTop = window.innerHeight / 3;
+
     const groups = jsonObj.groups.map((group, index) => {
       const component = this.addGroup(group.id, index === 0);
-      component.location.nativeElement.style.left =
-        group.style.offsetLeft + 'px';
-      component.location.nativeElement.style.top = group.style.offsetTop + 'px';
+      if (group.style) {
+        component.location.nativeElement.style.left =
+          group.style.offsetLeft + 'px';
+        component.location.nativeElement.style.top =
+          group.style.offsetTop + 'px';
+      } else {
+        component.location.nativeElement.style.left = offsetLeft + 'px';
+        offsetLeft += component.location.nativeElement.offsetWidth + 100;
+        component.location.nativeElement.style.top = offsetTop + 'px';
+      }
 
       setTimeout(() => {
         this.addNodesToGroup(this.jsPlumbInstance, group);
@@ -331,7 +341,7 @@ function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
 
 export interface PlumbNode {
   id: string;
-  style: {
+  style?: {
     offsetLeft: number;
     offsetTop: number;
   };
