@@ -248,8 +248,6 @@ export class PlumbService {
     const container = <HTMLElement>this.jsPlumbInstance.getContainer();
     container.style.opacity = '0';
 
-    const nodes = jsonObj.nodes.map((node) => this.addElement(node.id));
-
     let offsetLeft = 20;
     const offsetTop = window.innerHeight / 3;
 
@@ -265,12 +263,29 @@ export class PlumbService {
         offsetLeft += component.location.nativeElement.offsetWidth + 100;
         component.location.nativeElement.style.top = offsetTop + 'px';
       }
-
-      setTimeout(() => {
-        this.addNodesToGroup(this.jsPlumbInstance, group);
-      }, 0);
       return component;
     });
+
+    const nodes = jsonObj.nodes.map((node) => {
+      const component = this.addElement(node.id);
+      if (node.style) {
+        component.location.nativeElement.style.left =
+          node.style.offsetLeft + 'px';
+        component.location.nativeElement.style.top =
+          node.style.offsetTop + 'px';
+      } else {
+        component.location.nativeElement.style.left = offsetLeft + 'px';
+        offsetLeft += component.location.nativeElement.offsetWidth + 100;
+        component.location.nativeElement.style.top = offsetTop + 'px';
+      }
+      return component;
+    });
+
+    setTimeout(() => {
+      jsonObj.groups.forEach((group) => {
+        this.addNodesToGroup(this.jsPlumbInstance, group);
+      });
+    }, 0);
 
     setTimeout(() => {
       this.createConnections(jsonObj, this.jsPlumbInstance);
