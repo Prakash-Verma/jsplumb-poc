@@ -368,6 +368,27 @@ export class PlumbService {
     this.groups = [];
     this.jsPlumbInstance.reset();
   }
+
+  removeNode(elementId: string) {
+    const index = this.elements.findIndex(
+      (x) => x.instance.elementId === elementId
+    );
+    this.elements.splice(index, 1);
+
+    if (this.groups.length === 0 && this.elements.length === 0) {
+      this.jsPlumbInstance.reset();
+    }
+  }
+
+  removeGroup(elementId: string) {
+    const index = this.groups.findIndex(
+      (x) => x.instance.elementId === elementId
+    );
+    this.groups.splice(index, 1);
+    if (this.groups.length === 0 && this.elements.length === 0) {
+      this.jsPlumbInstance.reset();
+    }
+  }
 }
 
 function isDirtyCanvasFn(jsonObj: PlumbJson) {

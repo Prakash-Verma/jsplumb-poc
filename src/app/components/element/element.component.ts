@@ -22,4 +22,10 @@ export class ElementComponent implements AfterViewInit {
     this.plumbService.addSourceElement(this.elementRef.nativeElement);
     // this.plumbService.addTargetElement(this.elementRef.nativeElement);
   }
+
+  deleteNode() {
+    this.jsPlumbInstance.removeAllEndpoints(this.elementRef.nativeElement);
+    this.jsPlumbInstance._removeElement(this.elementRef.nativeElement);
+    this.plumbService.removeNode(this.elementId);
+  }
 }
