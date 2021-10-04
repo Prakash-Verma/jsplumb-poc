@@ -1,5 +1,6 @@
 import {
   ComponentFactoryResolver,
+  ComponentRef,
   ElementRef,
   Injectable,
   ViewContainerRef,
@@ -20,6 +21,9 @@ import { PointXY } from '@jsplumb/util';
 import { ElementComponent } from '../components/element/element.component';
 import { GroupComponent } from '../components/group/group.component';
 import { NotificationService } from '../components/notification/notification.service';
+
+const elementPrefix = 'Element';
+const groupPrefix = 'Group';
 
 @Injectable()
 export class PlumbService {
@@ -45,6 +49,9 @@ export class PlumbService {
     this._jsPlumbInstance = value;
   }
 
+  private elements: ComponentRef<ElementComponent>[] = [];
+  private groups: ComponentRef<GroupComponent>[] = [];
+
   constructor(
     private factoryResolver: ComponentFactoryResolver,
     private notification: NotificationService
@@ -63,17 +70,28 @@ export class PlumbService {
     this.containerRef = containerRef;
   }
 
-  public addElement(elementId: string) {
+  public addElement(elementId?: string) {
+    if (!elementId) {
+      elementId = `${elementPrefix} ${this.elements.length + 1}`;
+    }
+
     const factory =
       this.factoryResolver.resolveComponentFactory(ElementComponent);
     const componentRef =
       this.containerRef.createComponent<ElementComponent>(factory);
     componentRef.instance.elementId = elementId;
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
+
+    this.elements.push(componentRef);
     return componentRef;
   }
 
-  public addGroup(elementId: string, isFirstElement: boolean) {
+  public addGroup(elementId?: string) {
+    if (!elementId) {
+      elementId = `${groupPrefix} ${this.groups.length + 1}`;
+    }
+    const isFirstElement = this.groups.length === 0;
+
     const factory =
       this.factoryResolver.resolveComponentFactory(GroupComponent);
     const componentRef =
@@ -82,6 +100,8 @@ export class PlumbService {
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
     componentRef.instance.needSource = isFirstElement;
     componentRef.instance.needTarget = !isFirstElement;
+
+    this.groups.push(componentRef);
     return componentRef;
   }
 
@@ -182,7 +202,10 @@ export class PlumbService {
     this.jsPlumbInstance.addEndpoint(nativeElement, { anchor: 'Left' }, target);
   }
 
-  public createAndSaveJson(plumbGroups: PlumbGroup[], plumbNodes: PlumbNode[]) {
+  public createAndSaveJson(savePosition = true) {
+    const plumbGroups = this.getPlumbGroups(savePosition);
+    const plumbNodes = this.getPlumbNodes(savePosition);
+
     const plumbConnections = this.getConnections();
     const plumbJson = {
       groups: plumbGroups,
@@ -230,8 +253,8 @@ export class PlumbService {
     let offsetLeft = 20;
     const offsetTop = window.innerHeight / 3;
 
-    const groups = jsonObj.groups.map((group, index) => {
-      const component = this.addGroup(group.id, index === 0);
+    const groups = jsonObj.groups.map((group) => {
+      const component = this.addGroup(group.id);
       if (group.style) {
         component.location.nativeElement.style.left =
           group.style.offsetLeft + 'px';
@@ -256,7 +279,8 @@ export class PlumbService {
       this.jsPlumbInstance.setSuspendDrawing(false);
     }, 0);
 
-    return { groups, nodes };
+    this.groups = groups;
+    this.elements = nodes;
   }
 
   private createConnections(
@@ -294,6 +318,55 @@ export class PlumbService {
       jsPlumbInstance.getManagedElement(child)
     );
     jsPlumbInstance.addToGroup(uiGroup, ...uiNodes);
+  }
+
+  private getPlumbNodes(savePosition: boolean) {
+    return this.elements
+      .map((element) => {
+        const plumbNode = <HTMLElement>(
+          this.jsPlumbInstance.getManagedElement(element.instance.elementId)
+        );
+        const nodeJson = <PlumbNode>{ id: element.instance.elementId };
+
+        if (savePosition) {
+          nodeJson['style'] = {
+            offsetLeft: plumbNode.offsetLeft,
+            offsetTop: plumbNode.offsetTop,
+          };
+        }
+        return nodeJson;
+      })
+      .filter(Boolean);
+  }
+
+  private getPlumbGroups(savePosition: boolean) {
+    return this.groups
+      .map((group) => {
+        const plumbGroup = this.jsPlumbInstance.getGroup(
+          group.instance.elementId
+        );
+        const groupEle = <HTMLElement>plumbGroup.el;
+
+        const groupJson = <PlumbGroup>{
+          id: group.instance.elementId,
+          children: plumbGroup?.children.map((child) => child.el.id),
+        };
+
+        if (savePosition) {
+          groupJson['style'] = {
+            offsetLeft: groupEle.offsetLeft,
+            offsetTop: groupEle.offsetTop,
+          };
+        }
+        return groupJson;
+      })
+      .filter(Boolean);
+  }
+
+  clear() {
+    this.elements = [];
+    this.groups = [];
+    this.jsPlumbInstance.reset();
   }
 }
 
