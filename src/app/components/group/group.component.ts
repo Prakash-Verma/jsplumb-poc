@@ -52,6 +52,7 @@ export class GroupComponent implements AfterViewInit {
   }
 
   deleteNode() {
+    this.plumbService.removeGroup(this.elementId);
     this.jsPlumbInstance.removeGroup(this.elementId, true);
   }
 }

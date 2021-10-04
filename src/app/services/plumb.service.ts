@@ -72,7 +72,7 @@ export class PlumbService {
 
   public addElement(elementId?: string) {
     if (!elementId) {
-      elementId = `${elementPrefix} ${this.elements.length + 1}`;
+      elementId = `${elementPrefix}_${guidGenerator()}`;
     }
 
     const factory =
@@ -88,7 +88,7 @@ export class PlumbService {
 
   public addGroup(elementId?: string) {
     if (!elementId) {
-      elementId = `${groupPrefix} ${this.groups.length + 1}`;
+      elementId = `${groupPrefix}_${guidGenerator()}`;
     }
     const isFirstElement = this.groups.length === 0;
 
@@ -381,6 +381,12 @@ export class PlumbService {
   }
 
   removeGroup(elementId: string) {
+    const plumbGroup = this.jsPlumbInstance.getGroup(elementId);
+
+    plumbGroup.children.forEach((ele) => {
+      this.removeNode(ele.el.id);
+    });
+
     const index = this.groups.findIndex(
       (x) => x.instance.elementId === elementId
     );
@@ -455,4 +461,24 @@ interface PlumbJson {
   groups: PlumbGroup[];
   nodes: PlumbNode[];
   connections: PlumbConnection[];
+}
+
+function guidGenerator() {
+  function S4() {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+  }
+  return (
+    S4() +
+    S4() +
+    '-' +
+    S4() +
+    '-' +
+    S4() +
+    '-' +
+    S4() +
+    '-' +
+    S4() +
+    S4() +
+    S4()
+  );
 }
