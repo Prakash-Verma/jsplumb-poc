@@ -15,6 +15,10 @@ app-group {
     margin-left: 29px;
     background-color: #b731a9;
     color: #fff;
+    .close {
+      background-color: #fff !important;
+      color: #000 !important;
+    }
   }
 }
 @-webkit-keyframes strokeAnimation {
