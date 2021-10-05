@@ -50,4 +50,9 @@ export class GroupComponent implements AfterViewInit {
     }
     this.plumbService.addTargetElement(this.elementRef.nativeElement);
   }
+
+  deleteNode() {
+    this.plumbService.removeGroup(this.elementId);
+    this.jsPlumbInstance.removeGroup(this.elementId, true);
+  }
 }
