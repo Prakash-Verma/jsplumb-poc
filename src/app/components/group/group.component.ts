@@ -31,9 +31,7 @@ export class GroupComponent implements AfterViewInit {
     this.jsPlumbInstance.addGroup({
       el: this.elementRef.nativeElement,
       id: this.elementId,
-      droppable: true,
-      constrain: false,
-      revert: false,
+      orphan: true,
     });
   }
 
