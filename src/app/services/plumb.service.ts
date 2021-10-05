@@ -389,9 +389,13 @@ export class PlumbService {
     group: PlumbGroup
   ) {
     const uiGroup = jsPlumbInstance.getGroup(group.id);
-    const uiNodes = group.children.map((child) =>
-      jsPlumbInstance.getManagedElement(child)
-    );
+    const uiNodes = group.children.map((childId) => {
+      const isGroup = childId.includes('Group');
+      if (isGroup) {
+        return jsPlumbInstance.getGroup(childId).el;
+      }
+      return jsPlumbInstance.getManagedElement(childId);
+    });
     jsPlumbInstance.addToGroup(uiGroup, ...uiNodes);
   }
 
