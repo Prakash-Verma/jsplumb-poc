@@ -341,7 +341,20 @@ export class PlumbService {
     });
 
     setTimeout(() => {
-      jsonObj.groups.forEach((group) => {
+      const normalGroup: PlumbGroup[] = [];
+      const groupWithNestedGroup: PlumbGroup[] = [];
+      jsonObj.groups.forEach((g) => {
+        const hasGroupAsChild = g.children.some((childId) =>
+          childId.includes('Group')
+        );
+        if (hasGroupAsChild) {
+          groupWithNestedGroup.push(g);
+        } else {
+          normalGroup.push(g);
+        }
+      });
+
+      normalGroup.concat(groupWithNestedGroup).forEach((group) => {
         this.addNodesToGroup(this.jsPlumbInstance, group);
       });
     }, 0);
@@ -389,13 +402,15 @@ export class PlumbService {
     group: PlumbGroup
   ) {
     const uiGroup = jsPlumbInstance.getGroup(group.id);
-    const uiNodes = group.children.map((childId) => {
-      const isGroup = childId.includes('Group');
-      if (isGroup) {
-        return jsPlumbInstance.getGroup(childId).el;
-      }
-      return jsPlumbInstance.getManagedElement(childId);
-    });
+    const uiNodes = group.children
+      .map((childId) => {
+        const isGroup = childId.includes('Group');
+        if (isGroup) {
+          return jsPlumbInstance.getGroup(childId).el;
+        }
+        return jsPlumbInstance.getManagedElement(childId);
+      })
+      .filter(Boolean);
     jsPlumbInstance.addToGroup(uiGroup, ...uiNodes);
   }
 
