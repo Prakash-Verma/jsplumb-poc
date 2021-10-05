@@ -12,12 +12,14 @@ body {
 }
 app-group {
   app-group {
-    margin-left: 29px;
     background-color: #b731a9;
     color: #fff;
     .close {
       background-color: #fff !important;
       color: #000 !important;
+    }
+    app-element {
+      color: #000;
     }
   }
 }

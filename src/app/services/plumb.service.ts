@@ -14,6 +14,8 @@ import { FlowchartConnector } from '@jsplumb/connector-flowchart';
 import {
   EndpointOptions,
   EVENT_GROUP_MEMBER_ADDED,
+  EVENT_GROUP_MEMBER_REMOVED,
+  EVENT_NESTED_GROUP_REMOVED,
   UIGroup,
 } from '@jsplumb/core';
 import { PointXY } from '@jsplumb/util';
@@ -116,7 +118,41 @@ export class PlumbService {
       }) => {
         this.adjustPositionAndUI(params.el, params.group);
         setTimeout(() => {
-          // this.jsPlumbInstance.repaint(params.group.el);
+          this.jsPlumbInstance.repaintEverything();
+        }, 0);
+      }
+    );
+
+    this.jsPlumbInstance.bind(
+      EVENT_GROUP_MEMBER_REMOVED,
+      (params: {
+        group: UIGroup<HTMLElement>;
+        el: HTMLElement;
+        pos: PointXY;
+      }) => {
+        params.group.el.style.height =
+          parseInt(params.group.el.style.height.replace('px', '')) -
+          parseInt(getComputedStyle(params.el).height.replace('px', '')) +
+          'px';
+
+        setTimeout(() => {
+          this.jsPlumbInstance.repaintEverything();
+        }, 0);
+      }
+    );
+
+    this.jsPlumbInstance.bind(
+      EVENT_NESTED_GROUP_REMOVED,
+      (params: {
+        parent: UIGroup<HTMLElement>;
+        child: UIGroup<HTMLElement>;
+      }) => {
+        params.parent.el.style.height =
+          parseInt(params.parent.el.style.height.replace('px', '')) -
+          parseInt(getComputedStyle(params.child.el).height.replace('px', '')) +
+          'px';
+
+        setTimeout(() => {
           this.jsPlumbInstance.repaintEverything();
         }, 0);
       }
@@ -148,8 +184,8 @@ export class PlumbService {
       }
     });
 
-    if (group.el.offsetWidth < maxWidth + 10) {
-      group.el.style.width = maxWidth + 10 + 'px';
+    if (group.el.offsetWidth < maxWidth + 50) {
+      group.el.style.width = maxWidth + 50 + 'px';
     }
   }
 
@@ -177,6 +213,7 @@ export class PlumbService {
       paintStyle: { fill: '#fff', stroke: '#b731a9' },
       source: true,
       connectorStyle: { stroke: '#b731a9', strokeWidth: 1 },
+      maxConnections: 5,
       connectorOverlays: [
         { type: 'PlainArrow', options: { location: 1, width: 12, length: 10 } },
         {
@@ -217,6 +254,7 @@ export class PlumbService {
         options: { radius: 5 },
       },
       paintStyle: { stroke: '#b731a9', fill: '#fff' },
+      maxConnections: 5,
       target: true,
     };
 
@@ -461,7 +499,7 @@ function getEndpointForConnection(
 }
 
 function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
-  const left = (group.el.offsetWidth - element.offsetWidth) / 2;
+  const left = (group.el.offsetWidth - element.offsetWidth) / 2 + 10;
 
   let totalOffset = 0;
   let count = 1;

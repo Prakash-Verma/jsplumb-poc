@@ -1,6 +1,6 @@
 import { Component, ComponentRef, ElementRef, Input } from '@angular/core';
 import { BrowserJsPlumbInstance } from '@jsplumb/browser-ui';
-import { PlumbService } from 'src/app/services/plumb.service';
+import { PlumbService } from '../../services/plumb.service';
 
 import { GroupComponent } from '../group/group.component';
 
