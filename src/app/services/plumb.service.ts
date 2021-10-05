@@ -17,8 +17,8 @@ import {
   UIGroup,
 } from '@jsplumb/core';
 import { PointXY } from '@jsplumb/util';
-import { ConnectorMenuComponent } from '../components/connector-menu/connector-menu.component';
 
+import { ConnectorMenuComponent } from '../components/connector-menu/connector-menu.component';
 import { ElementComponent } from '../components/element/element.component';
 import { GroupComponent } from '../components/group/group.component';
 import { NotificationService } from '../components/notification/notification.service';
@@ -309,7 +309,7 @@ export class PlumbService {
     }, 0);
 
     setTimeout(() => {
-      this.createConnections(jsonObj, this.jsPlumbInstance);
+      this.createConnections(jsonObj);
 
       container.style.opacity = '1';
       this.jsPlumbInstance.setSuspendDrawing(false);
@@ -319,30 +319,31 @@ export class PlumbService {
     this.elements = nodes;
   }
 
-  private createConnections(
-    jsonObj: PlumbJson,
-    jsPlumbInstance: BrowserJsPlumbInstance
-  ) {
+  private createConnections(jsonObj: PlumbJson) {
     jsonObj.connections.forEach((conn) => {
-      const srcEndpoint = getEndpointForConnection(
-        conn.source.id,
-        conn.source.isGroup,
-        true,
-        jsPlumbInstance
-      );
-      const targetEndpoint = getEndpointForConnection(
-        conn.target.id,
-        conn.target.isGroup,
-        false,
-        jsPlumbInstance
-      );
-      if (srcEndpoint && targetEndpoint) {
-        jsPlumbInstance.connect({
-          source: srcEndpoint,
-          target: targetEndpoint,
-        });
-      }
+      this.createSingleConnection(conn);
     });
+  }
+
+  public createSingleConnection(conn: PlumbConnection) {
+    const srcEndpoint = getEndpointForConnection(
+      conn.source.id,
+      conn.source.isGroup,
+      true,
+      this.jsPlumbInstance
+    );
+    const targetEndpoint = getEndpointForConnection(
+      conn.target.id,
+      conn.target.isGroup,
+      false,
+      this.jsPlumbInstance
+    );
+    if (srcEndpoint && targetEndpoint) {
+      this.jsPlumbInstance.connect({
+        source: srcEndpoint,
+        target: targetEndpoint,
+      });
+    }
   }
 
   private addNodesToGroup(
@@ -488,7 +489,7 @@ export interface PlumbGroup extends PlumbNode {
 }
 
 interface PlumbConnection {
-  connectionId: string;
+  connectionId?: string;
   source: { id: string; isGroup: boolean };
   target: { id: string; isGroup: boolean };
 }
