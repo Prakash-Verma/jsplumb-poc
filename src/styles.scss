@@ -10,3 +10,27 @@ body {
     }
   }
 }
+app-group {
+  app-group {
+    margin-left: 29px;
+  }
+}
+@-webkit-keyframes strokeAnimation {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes strokeAnimation {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+.jtk-connector.jtk-hover > :nth-child(2) {
+  stroke-dasharray: 20;
+  -webkit-animation: strokeAnimation 8s linear;
+  animation: strokeAnimation 8s linear;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
