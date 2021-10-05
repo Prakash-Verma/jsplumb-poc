@@ -13,6 +13,8 @@ body {
 app-group {
   app-group {
     margin-left: 29px;
+    background-color: #b731a9;
+    color: #fff;
   }
 }
 @-webkit-keyframes strokeAnimation {
@@ -33,4 +35,10 @@ app-group {
   animation: strokeAnimation 8s linear;
   -webkit-animation-iteration-count: infinite;
   animation-iteration-count: infinite;
+}
+.jtk-connector.jtk-hover + app-connector-menu {
+  .add,
+  .delete {
+    visibility: visible !important;
+  }
 }

@@ -9,6 +9,7 @@ import { GroupComponent } from './components/group/group.component';
 import { NotificationComponent } from './components/notification/notification.component';
 import { NotificationService } from './components/notification/notification.service';
 import { PlumbService } from './services/plumb.service';
+import { ConnectorMenuComponent } from './components/connector-menu/connector-menu.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { PlumbService } from './services/plumb.service';
     ElementComponent,
     GroupComponent,
     NotificationComponent,
+    ConnectorMenuComponent,
   ],
   imports: [BrowserModule, AppRoutingModule],
   providers: [PlumbService, NotificationService],

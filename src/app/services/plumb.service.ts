@@ -17,6 +17,7 @@ import {
   UIGroup,
 } from '@jsplumb/core';
 import { PointXY } from '@jsplumb/util';
+import { ConnectorMenuComponent } from '../components/connector-menu/connector-menu.component';
 
 import { ElementComponent } from '../components/element/element.component';
 import { GroupComponent } from '../components/group/group.component';
@@ -178,7 +179,25 @@ export class PlumbService {
       connectorStyle: { stroke: '#b731a9', strokeWidth: 1 },
       connectorOverlays: [
         { type: 'PlainArrow', options: { location: 1, width: 12, length: 10 } },
+        {
+          type: 'Custom',
+          options: {
+            create: () => {
+              const factory = this.factoryResolver.resolveComponentFactory(
+                ConnectorMenuComponent
+              );
+              const component = this.containerRef.createComponent(factory);
+              return component.instance.elementRef.nativeElement;
+            },
+            location: 0.5,
+          },
+        },
       ],
+      connectorHoverStyle: {
+        fill: 'none',
+        outlineStroke: 'transparent',
+        outlineWidth: 7,
+      },
     };
     this.jsPlumbInstance.addEndpoint(
       nativeElement,

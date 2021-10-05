@@ -1,0 +1,17 @@
+.add,
+.delete {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #b731a9;
+  font-size: 20px;
+  line-height: 20px;
+  display: inline-block;
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+  visibility: hidden;
+}
+.add {
+  margin-left: 15px;
+}
