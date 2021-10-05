@@ -187,6 +187,8 @@ export class PlumbService {
                 ConnectorMenuComponent
               );
               const component = this.containerRef.createComponent(factory);
+              component.instance.parentElementId = nativeElement.id;
+              component.instance.jsPlumbInstance = this.jsPlumbInstance;
               return component.instance.elementRef.nativeElement;
             },
             location: 0.5,
