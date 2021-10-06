@@ -1,6 +1,5 @@
 import {
   ComponentFactoryResolver,
-  ComponentRef,
   ElementRef,
   Injectable,
   ViewContainerRef,
@@ -20,10 +19,18 @@ import {
 } from '@jsplumb/core';
 import { PointXY } from '@jsplumb/util';
 
-import { ConnectorMenuComponent } from '../components/connector-menu/connector-menu.component';
-import { ElementComponent } from '../components/element/element.component';
-import { GroupComponent } from '../components/group/group.component';
 import { NotificationService } from '../components/notification/notification.service';
+import {
+  ElementComponentRef,
+  getConnectorMenuComponent,
+  getElementComponent,
+  getGroupComponent,
+  GroupComponentRef,
+  PlumbConnection,
+  PlumbGroup,
+  PlumbJson,
+  PlumbNode,
+} from './utils';
 
 const elementPrefix = 'Element';
 const groupPrefix = 'Group';
@@ -52,8 +59,8 @@ export class PlumbService {
     this._jsPlumbInstance = value;
   }
 
-  private elements: ComponentRef<ElementComponent>[] = [];
-  private groups: ComponentRef<GroupComponent>[] = [];
+  private elements: ElementComponentRef[] = [];
+  private groups: GroupComponentRef[] = [];
 
   constructor(
     private factoryResolver: ComponentFactoryResolver,
@@ -78,10 +85,10 @@ export class PlumbService {
       elementId = `${elementPrefix}_${guidGenerator()}`;
     }
 
-    const factory =
-      this.factoryResolver.resolveComponentFactory(ElementComponent);
-    const componentRef =
-      this.containerRef.createComponent<ElementComponent>(factory);
+    const componentRef = getElementComponent(
+      this.factoryResolver,
+      this.containerRef
+    );
     componentRef.instance.elementId = elementId;
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
 
@@ -95,10 +102,10 @@ export class PlumbService {
     }
     const isFirstElement = this.groups.length === 0;
 
-    const factory =
-      this.factoryResolver.resolveComponentFactory(GroupComponent);
-    const componentRef =
-      this.containerRef.createComponent<GroupComponent>(factory);
+    const componentRef = getGroupComponent(
+      this.factoryResolver,
+      this.containerRef
+    );
     componentRef.instance.elementId = elementId;
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
     componentRef.instance.needSource = isFirstElement;
@@ -220,10 +227,10 @@ export class PlumbService {
           type: 'Custom',
           options: {
             create: () => {
-              const factory = this.factoryResolver.resolveComponentFactory(
-                ConnectorMenuComponent
+              const component = getConnectorMenuComponent(
+                this.factoryResolver,
+                this.containerRef
               );
-              const component = this.containerRef.createComponent(factory);
               component.instance.parentElementId = nativeElement.id;
               component.instance.jsPlumbInstance = this.jsPlumbInstance;
               return component.instance.elementRef.nativeElement;
@@ -531,30 +538,6 @@ function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
   const top = totalOffset + 50 + count * 5;
 
   return { x: left, y: top };
-}
-
-export interface PlumbNode {
-  id: string;
-  style?: {
-    offsetLeft: number;
-    offsetTop: number;
-  };
-}
-
-export interface PlumbGroup extends PlumbNode {
-  children: string[];
-}
-
-interface PlumbConnection {
-  connectionId?: string;
-  source: { id: string; isGroup: boolean };
-  target: { id: string; isGroup: boolean };
-}
-
-interface PlumbJson {
-  groups: PlumbGroup[];
-  nodes: PlumbNode[];
-  connections: PlumbConnection[];
 }
 
 function guidGenerator() {
