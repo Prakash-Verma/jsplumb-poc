@@ -1,3 +1,11 @@
+$pathToAssets: "../../../assets";
+$white-color: #fff;
+$theme-color: #bf23af;
+$border-color: #c8c8c8;
+$light-background: #f7f7f7;
+$link-color: #006bb1;
+$text-color: #000;
+
 :host {
   position: absolute;
   border-radius: 4px;
@@ -49,5 +57,185 @@
   background-color: #cdcdcd;
   &:hover {
     background-color: #b9b9a0;
+  }
+}
+
+.schedule-card {
+  border: 1px solid #c8c8c8;
+  border-top: 0;
+  border-radius: 0 0 10 px;
+  .schedule-container {
+    width: 275px;
+    min-height: 100px;
+    border-radius: 10px 10px 10px 0;
+    overflow: hidden;
+    .schedule-calendar {
+      background: $white-color;
+      h3 {
+        background: $theme-color;
+        border: 1px solid #bf23af;
+        border-radius: 10px 10px 0 0;
+        color: $white-color;
+        line-height: 22px;
+        font-weight: 600;
+        padding: 9px 15px 9px 12px;
+        margin: 0px;
+        height: 40px;
+        strong {
+          font-weight: 600;
+          display: inline-block;
+          max-width: calc(100% - 72px);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          vertical-align: top;
+          padding-right: 5px;
+        }
+        span {
+          font-weight: 500;
+        }
+      }
+      .calender-content {
+        border: 1px solid $border-color;
+        border-top: 0;
+        border-radius: 0px 0px 10px 0;
+        h4 {
+          background: $light-background;
+          line-height: 22px;
+          color: $link-color;
+          padding: 9px 12px;
+          margin: 0px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-weight: 500;
+          height: 40px;
+        }
+        .calender-view {
+          padding: 6px 12px 10px;
+          background: url("#{$pathToAssets}/images/preview-icon.svg");
+          background-position: 184px 9px;
+          background-repeat: no-repeat;
+          h2 {
+            font-weight: 600;
+            line-height: 22px;
+            text-align: center;
+            color: $text-color;
+            width: 100%;
+            padding: 6px 0 10px;
+          }
+          ul.calender-days-listing {
+            width: 200px;
+            margin: 0 auto;
+            text-align: center;
+            li {
+              display: inline-block;
+              line-height: 22px;
+              width: 32%;
+              text-align: center;
+            }
+          }
+          .calender-date-listing {
+            width: 100%;
+            padding: 5px 0 16px;
+            span {
+              display: inline-block;
+              vertical-align: middle;
+              &.previous-date {
+                margin-left: 5px;
+                -webkit-transform: rotate(
+                  180deg
+                ); /* Chrome and other webkit browsers */
+                -moz-transform: rotate(180deg); /* FF */
+                -o-transform: rotate(180deg); /* Opera */
+                -ms-transform: rotate(180deg); /* IE9 */
+                transform: rotate(180deg); /* W3C compliant browsers */
+                .add-oui-icon {
+                  color: $border-color;
+                }
+              }
+              &.previous-date {
+                padding-top: 0px;
+              }
+              &.next-date {
+                padding-top: 2px;
+              }
+              .add-oui-icon {
+                vertical-align: top;
+                color: $theme-color;
+              }
+            }
+            ul {
+              display: inline-block;
+              text-align: center;
+              vertical-align: middle;
+              width: 169px;
+              margin-left: -12px;
+              li {
+                display: inline-block;
+                line-height: 22px;
+                width: 32%;
+                text-align: center;
+                a {
+                  text-decoration: none;
+                  color: $text-color;
+                  font-size: 12px;
+                  font-weight: 700;
+                  line-height: 17px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  margin: 0 auto;
+                  height: 29px;
+                  width: 29px;
+                  cursor: inherit;
+                  &.active {
+                    background: $theme-color;
+                    color: $white-color;
+                    border-radius: 50%;
+                  }
+                }
+              }
+            }
+          }
+          .calender-timing {
+            ul {
+              list-style-type: none;
+              display: block;
+              li {
+                border: 1px solid $theme-color;
+                border-radius: 21.5px;
+                width: 70px;
+                height: 20px;
+                margin: 2px 0 6px;
+                text-align: center;
+                padding: 8px 5px 9px;
+                color: $theme-color;
+                float: left;
+                margin-right: 9px;
+                &:nth-child(2n) {
+                  margin-right: 0px;
+                }
+              }
+              &:after {
+                clear: both;
+                display: block;
+                content: "";
+              }
+            }
+          }
+          .more-timing {
+            span {
+              line-height: 22px;
+              color: $border-color;
+              &.more-time {
+                float: right;
+                color: $link-color;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

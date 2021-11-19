@@ -29,7 +29,7 @@ export class CanvasComponent {
   }
 
   addGroup() {
-    this.plumbService.addGroup();
+    this.plumbService.addGroup(undefined);
   }
 
   saveJsGram() {
@@ -45,6 +45,6 @@ export class CanvasComponent {
   }
 
   ReCreate() {
-    this.plumbService.recreate();
+    this.plumbService.recreateWithChatbotData();
   }
 }

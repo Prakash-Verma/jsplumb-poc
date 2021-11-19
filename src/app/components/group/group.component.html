@@ -1,10 +1,197 @@
 <div class="close" (click)="deleteNode()">x</div>
 <div class="group-content">
   <div class="left-bar">
-    <img src="assets/chat-icon-2.svg" alt="Chat" />
+    <img src="assets/images/chat-icon-2.svg" alt="Chat" />
   </div>
+
   <div class="inner-content">
-    <p>Welcome: CTA(Single select)</p>
-    <p>Would you like to schedule a call?</p>
+    <h4>
+      <p>
+        {{ index }}. {{ interaction.name || "" }}
+        <span>({{ interaction.label }})</span>
+      </p>
+    </h4>
+
+    <div [ngSwitch]="interaction.interaction_type">
+      <div *ngSwitchCase="interactionType.action">
+        <div [ngSwitch]="interaction.action_type">
+          <!-- <div *ngSwitchCase="interactionKind.end_conversation">
+            <p
+              *ngIf="
+                interaction.interaction_text &&
+                interaction.interaction_text !==
+                  defaultFormTextValues.end_chat_interaction_text
+              "
+            >
+              {{ interaction.interaction_text | removeHtmlTags }}
+            </p>
+          </div>
+          <div *ngSwitchCase="interactionKind.contact_status">
+            <div
+              class="minHeading contact-status-spacing"
+              *ngIf="
+                interaction.interaction_options &&
+                interaction.interaction_options.length === 1
+              "
+            >
+              <strong>Contact status updated to:</strong>
+              {{
+                interaction.interaction_options[0].option_text
+                  | removeHtmlTags
+              }}
+            </div>
+          </div>
+          <div *ngSwitchCase="interactionKind.email_alert">
+            <div
+              *ngIf="
+                interaction.email_alert_recipients &&
+                interaction.email_alert_recipients.length > 0
+              "
+            >
+              <div class="minHeading">Email will be sent to:</div>
+              <div
+                *ngIf="
+                  filterFunction(
+                    interaction.email_alert_recipients,
+                    'TeamPool'
+                  ).length > 0
+                "
+                class="teams"
+              >
+                <strong>Teams: </strong>
+                <span
+                  *ngFor="
+                    let recipients of filterFunction(
+                      interaction.email_alert_recipients,
+                      'TeamPool'
+                    );
+                    last as isLast
+                  "
+                >
+                  <span>{{
+                    isLast ? recipients.name : recipients.name.trim() + ", "
+                  }}</span>
+                </span>
+              </div>
+              <div
+                *ngIf="
+                  filterFunction(interaction.email_alert_recipients, 'User')
+                    .length > 0
+                "
+                class="users"
+              >
+                <strong>Users: </strong>
+                <span
+                  *ngFor="
+                    let recipients of filterFunction(
+                      interaction.email_alert_recipients,
+                      'User'
+                    );
+                    last as isLast
+                  "
+                >
+                  <span>{{
+                    isLast ? recipients.name : recipients.name.trim() + ", "
+                  }}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div *ngSwitchCase="interactionKind.live_chat">
+            <p *ngIf="interaction.handoff_message">
+              {{ interaction.handoff_message | removeHtmlTags }}
+            </p>
+          </div> -->
+          <div class="schedule-card" *ngSwitchCase="interactionKind.schedule">
+            <div class="schedule-container">
+              <div class="schedule-calendar">
+                <h3>
+                  <strong>{{ interaction.interaction_text }}</strong>
+                  <span
+                    *ngIf="
+                      interaction.schedule_action_event_type_meeting_length
+                    "
+                    >|{{
+                      interaction.schedule_action_event_type_meeting_length
+                    }}mins</span
+                  >
+                </h3>
+                <div class="calender-content">
+                  <h4>(GMT -5.00) United States; Central time</h4>
+                  <div class="calender-view">
+                    <h2>
+                      {{ currentDate | date: "MMMM" }}
+                      {{ currentDate | date: "yyyy" }}
+                    </h2>
+                    <ul class="calender-days-listing">
+                      <li>{{ nextDay | date: "EEE" }}</li>
+                      <li>{{ secondNextDay | date: "EEE" }}</li>
+                      <li>{{ thirdNextDay | date: "EEE" }}</li>
+                    </ul>
+                    <div class="calender-date-listing">
+                      <span class="previous-date">
+                        <oui-icon
+                          class="add-oui-icon"
+                          svgIcon="arrow"
+                        ></oui-icon>
+                      </span>
+                      <ul>
+                        <li>
+                          <a class="active" href="#">{{
+                            nextDay | date: "dd"
+                          }}</a>
+                        </li>
+                        <li>
+                          <a href="#">{{ secondNextDay | date: "dd" }}</a>
+                        </li>
+                        <li>
+                          <a href="#">{{ thirdNextDay | date: "dd" }}</a>
+                        </li>
+                      </ul>
+                      <span class="next-date">
+                        <oui-icon
+                          class="add-oui-icon"
+                          svgIcon="arrow"
+                        ></oui-icon>
+                      </span>
+                    </div>
+                    <div class="calender-timing">
+                      <ul>
+                        <li>9:00 AM</li>
+                        <li>12:00 PM</li>
+                        <li>10:00 AM</li>
+                        <li>1:00 PM</li>
+                      </ul>
+                    </div>
+                    <div class="more-timing">
+                      <span>Prev</span>
+                      <span class="more-time">More times</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngSwitchCase="interactionType.message">
+        <div [ngSwitch]="interaction.message_type">
+          <p *ngSwitchCase="interactionKind.text_message">
+            {{ interaction.interaction_text }}
+          </p>
+        </div>
+      </div>
+      <div *ngSwitchCase="interactionType.question">
+        <div [ngSwitch]="interaction.question_type">
+          <p>{{ interaction.interaction_text }}</p>
+          <ng-container *ngIf="interaction.bot_response">
+            <div>
+              <p>Answer from visitor</p>
+            </div>
+            <p>{{ interaction.bot_response }}</p>
+          </ng-container>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

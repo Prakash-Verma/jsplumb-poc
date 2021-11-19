@@ -1,5 +1,9 @@
 import { AfterViewInit, Component, ElementRef, Input } from '@angular/core';
 import { BrowserJsPlumbInstance } from '@jsplumb/browser-ui';
+import { interactionKind } from 'src/app/constants/interaction-kind';
+import { interactionList } from 'src/app/constants/interaction-list';
+import { interactionTypes } from 'src/app/constants/interaction-types';
+import { Interaction } from 'src/app/mock-data/mock-interaction';
 
 import { PlumbService } from '../../services/plumb.service';
 
@@ -13,6 +17,17 @@ export class GroupComponent implements AfterViewInit {
   @Input() jsPlumbInstance!: BrowserJsPlumbInstance;
   @Input() needSource = false;
   @Input() needTarget = true;
+  @Input() interaction!: Interaction;
+  @Input() index: number = 0;
+
+  interactionKind = JSON.parse(JSON.stringify(interactionKind));
+  interactionType = JSON.parse(JSON.stringify(interactionTypes));
+  interactionList = JSON.parse(JSON.stringify(interactionList));
+
+  currentDate = new Date();
+  nextDay: number = 1;
+  secondNextDay: number = 2;
+  thirdNextDay: number = 3;
 
   constructor(
     public elementRef: ElementRef,
@@ -25,6 +40,9 @@ export class GroupComponent implements AfterViewInit {
 
     this.addSource();
     this.addTarget();
+
+    this.interaction.label = this.getInteractionLabelAndIcon().label;
+    this.getNextThreeDaysFromToday();
   }
 
   private addGroupElement() {
@@ -52,5 +70,32 @@ export class GroupComponent implements AfterViewInit {
   deleteNode() {
     this.plumbService.removeGroup(this.elementId);
     this.jsPlumbInstance.removeGroup(this.elementId, true);
+  }
+
+  private getInteractionLabelAndIcon() {
+    let label = '';
+    let icon = '';
+    this.interactionList[this.interaction.interaction_type].items.some(
+      (question: any) => {
+        // Adding label to interaction
+        if (
+          question[`${this.interaction.interaction_type}_type`] ===
+          (<any>this.interaction)[`${this.interaction.interaction_type}_type`]
+        ) {
+          label = question.label;
+          icon = question.icon_type;
+          return true; // Breaking loop when found
+        }
+        return false;
+      }
+    );
+    return { label: label, icon: icon };
+  }
+
+  private getNextThreeDaysFromToday() {
+    const today = new Date();
+    this.nextDay = today.setDate(today.getDate() + 1);
+    this.secondNextDay = today.setDate(today.getDate() + 1);
+    this.thirdNextDay = today.setDate(today.getDate() + 1);
   }
 }

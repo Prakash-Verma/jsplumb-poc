@@ -20,6 +20,7 @@ import {
 import { PointXY } from '@jsplumb/util';
 
 import { NotificationService } from '../components/notification/notification.service';
+import { Interaction, mock_interactions } from '../mock-data/mock-interaction';
 import {
   ElementComponentRef,
   getConnectorMenuComponent,
@@ -96,7 +97,11 @@ export class PlumbService {
     return componentRef;
   }
 
-  public addGroup(elementId?: string) {
+  public addGroup(
+    elementId: string | undefined,
+    interaction?: Interaction,
+    index?: number
+  ) {
     if (!elementId) {
       elementId = `${groupPrefix}_${guidGenerator()}`;
     }
@@ -110,6 +115,12 @@ export class PlumbService {
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
     componentRef.instance.needSource = isFirstElement;
     componentRef.instance.needTarget = !isFirstElement;
+    if (interaction) {
+      componentRef.instance.interaction = interaction;
+    }
+    if (index) {
+      componentRef.instance.index = index;
+    }
 
     this.groups.push(componentRef);
     return componentRef;
@@ -375,6 +386,75 @@ export class PlumbService {
 
     this.groups = groups;
     this.elements = nodes;
+  }
+
+  recreateWithChatbotData() {
+    this.clear();
+    const interactions: Interaction[] = JSON.parse(
+      JSON.stringify(mock_interactions)
+    );
+
+    let offsetLeft = 20;
+    const offsetTop = window.innerHeight / 3;
+
+    const groups = interactions.map((interaction, i) => {
+      const component = this.addGroup(undefined, interaction, i + 1);
+      // if (group.style) {
+      //   component.location.nativeElement.style.left =
+      //     group.style.offsetLeft + 'px';
+      //   component.location.nativeElement.style.top =
+      //     group.style.offsetTop + 'px';
+      // } else {
+      component.location.nativeElement.style.left = offsetLeft + 'px';
+      offsetLeft += component.location.nativeElement.offsetWidth + 100;
+      component.location.nativeElement.style.top = offsetTop + 'px';
+      // }
+      return component;
+    });
+
+    // const nodes = jsonObj.nodes.map((node) => {
+    //   const component = this.addElement(node.id);
+    //   if (node.style) {
+    //     component.location.nativeElement.style.left =
+    //       node.style.offsetLeft + 'px';
+    //     component.location.nativeElement.style.top =
+    //       node.style.offsetTop + 'px';
+    //   } else {
+    //     component.location.nativeElement.style.left = offsetLeft + 'px';
+    //     offsetLeft += component.location.nativeElement.offsetWidth + 100;
+    //     component.location.nativeElement.style.top = offsetTop + 'px';
+    //   }
+    //   return component;
+    // });
+
+    // setTimeout(() => {
+    //   const normalGroup: PlumbGroup[] = [];
+    //   const groupWithNestedGroup: PlumbGroup[] = [];
+    //   jsonObj.groups.forEach((g) => {
+    //     const hasGroupAsChild = g.children.some((childId) =>
+    //       childId.includes('Group')
+    //     );
+    //     if (hasGroupAsChild) {
+    //       groupWithNestedGroup.push(g);
+    //     } else {
+    //       normalGroup.push(g);
+    //     }
+    //   });
+
+    //   normalGroup.concat(groupWithNestedGroup).forEach((group) => {
+    //     this.addNodesToGroup(this.jsPlumbInstance, group);
+    //   });
+    // }, 0);
+
+    // setTimeout(() => {
+    //   this.createConnections(jsonObj);
+
+    //   container.style.opacity = '1';
+    //   this.jsPlumbInstance.setSuspendDrawing(false);
+    // }, 0);
+
+    // this.groups = groups;
+    // this.elements = nodes;
   }
 
   private createConnections(jsonObj: PlumbJson) {

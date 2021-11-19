@@ -105,7 +105,7 @@ export class ConnectorMenuComponent {
   }
 
   private addIntermediateGroup() {
-    const group = this.plumbService.addGroup();
+    const group = this.plumbService.addGroup(undefined);
     const element = this.plumbService.addElement();
     return { group, element };
   }
