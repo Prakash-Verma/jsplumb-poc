@@ -6,7 +6,8 @@ import {
 } from '@angular/core';
 
 import { PlumbService } from '../../services/plumb.service';
-
+import { mock_interactions } from '../../chatbot/mock-data/mock-interaction';
+import { mock_meeting_bot_interactions } from '../../chatbot/mock-data/mock-meeting_interactions';
 @Component({
   selector: 'app-canvas',
   templateUrl: './canvas.component.html',
@@ -45,6 +46,15 @@ export class CanvasComponent {
   }
 
   ReCreate() {
-    this.plumbService.recreateWithChatbotData();
+    this.plumbService.recreate();
   }
+
+  ReCreateBot() {
+    this.plumbService.recreateWithChatbotData(mock_interactions);
+  }
+
+  ReCreateMeetingBot() {
+    this.plumbService.recreateWithChatbotData(mock_meeting_bot_interactions);
+  }
+
 }

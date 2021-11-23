@@ -20,8 +20,7 @@ import {
 import { PointXY } from '@jsplumb/util';
 
 import { NotificationService } from '../components/notification/notification.service';
-import { Interaction} from '../chatbot/models/interaction';
-import { mock_interactions } from '../chatbot/mock-data/mock-interaction';
+import { Interaction } from '../chatbot/models/interaction';
 import {
   ElementComponentRef,
   getConnectorMenuComponent,
@@ -389,7 +388,7 @@ export class PlumbService {
     this.elements = nodes;
   }
 
-  recreateWithChatbotData() {
+  recreateWithChatbotData(mock_interactions: Interaction[]) {
     this.clear();
     const interactions: Interaction[] = JSON.parse(
       JSON.stringify(mock_interactions)

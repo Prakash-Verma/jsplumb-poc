@@ -7,36 +7,36 @@
   <div class="inner-content">
     <h4>
       <p>
-        {{ index }}. {{ interaction.name || "" }}
-        <span>({{ interaction.label }})</span>
+        {{ index }}. {{ interaction?.name || "" }}
+        <span>({{ interaction?.label }})</span>
       </p>
     </h4>
 
-    <div [ngSwitch]="interaction.interaction_type">
+    <div [ngSwitch]="interaction?.interaction_type">
       <div *ngSwitchCase="interactionType.action">
-        <div [ngSwitch]="interaction.action_type">
+        <div [ngSwitch]="interaction?.action_type">
           <!-- <div *ngSwitchCase="interactionKind.end_conversation">
             <p
               *ngIf="
-                interaction.interaction_text &&
-                interaction.interaction_text !==
+                interaction?.interaction_text &&
+                interaction?.interaction_text !==
                   defaultFormTextValues.end_chat_interaction_text
               "
             >
-              {{ interaction.interaction_text | removeHtmlTags }}
+              {{ interaction?.interaction_text | removeHtmlTags }}
             </p>
           </div>
           <div *ngSwitchCase="interactionKind.contact_status">
             <div
               class="minHeading contact-status-spacing"
               *ngIf="
-                interaction.interaction_options &&
-                interaction.interaction_options.length === 1
+                interaction?.interaction_options &&
+                interaction?.interaction_options.length === 1
               "
             >
               <strong>Contact status updated to:</strong>
               {{
-                interaction.interaction_options[0].option_text
+                interaction?.interaction_options[0].option_text
                   | removeHtmlTags
               }}
             </div>
@@ -44,15 +44,15 @@
           <div *ngSwitchCase="interactionKind.email_alert">
             <div
               *ngIf="
-                interaction.email_alert_recipients &&
-                interaction.email_alert_recipients.length > 0
+                interaction?.email_alert_recipients &&
+                interaction?.email_alert_recipients.length > 0
               "
             >
               <div class="minHeading">Email will be sent to:</div>
               <div
                 *ngIf="
                   filterFunction(
-                    interaction.email_alert_recipients,
+                    interaction?.email_alert_recipients,
                     'TeamPool'
                   ).length > 0
                 "
@@ -62,7 +62,7 @@
                 <span
                   *ngFor="
                     let recipients of filterFunction(
-                      interaction.email_alert_recipients,
+                      interaction?.email_alert_recipients,
                       'TeamPool'
                     );
                     last as isLast
@@ -75,7 +75,7 @@
               </div>
               <div
                 *ngIf="
-                  filterFunction(interaction.email_alert_recipients, 'User')
+                  filterFunction(interaction?.email_alert_recipients, 'User')
                     .length > 0
                 "
                 class="users"
@@ -84,7 +84,7 @@
                 <span
                   *ngFor="
                     let recipients of filterFunction(
-                      interaction.email_alert_recipients,
+                      interaction?.email_alert_recipients,
                       'User'
                     );
                     last as isLast
@@ -98,21 +98,21 @@
             </div>
           </div>
           <div *ngSwitchCase="interactionKind.live_chat">
-            <p *ngIf="interaction.handoff_message">
-              {{ interaction.handoff_message | removeHtmlTags }}
+            <p *ngIf="interaction?.handoff_message">
+              {{ interaction?.handoff_message | removeHtmlTags }}
             </p>
           </div> -->
           <div class="schedule-card" *ngSwitchCase="interactionKind.schedule">
             <div class="schedule-container">
               <div class="schedule-calendar">
                 <h3>
-                  <strong>{{ interaction.interaction_text }}</strong>
+                  <strong>{{ interaction?.interaction_text }}</strong>
                   <span
                     *ngIf="
-                      interaction.schedule_action_event_type_meeting_length
+                      interaction?.schedule_action_event_type_meeting_length
                     "
                     >|{{
-                      interaction.schedule_action_event_type_meeting_length
+                      interaction?.schedule_action_event_type_meeting_length
                     }}mins</span
                   >
                 </h3>
@@ -175,20 +175,20 @@
         </div>
       </div>
       <div *ngSwitchCase="interactionType.message">
-        <div [ngSwitch]="interaction.message_type">
+        <div [ngSwitch]="interaction?.message_type">
           <p *ngSwitchCase="interactionKind.text_message">
-            {{ interaction.interaction_text }}
+            {{ interaction?.interaction_text }}
           </p>
         </div>
       </div>
       <div *ngSwitchCase="interactionType.question">
-        <div [ngSwitch]="interaction.question_type">
-          <p>{{ interaction.interaction_text }}</p>
-          <ng-container *ngIf="interaction.bot_response">
+        <div [ngSwitch]="interaction?.question_type">
+          <p>{{ interaction?.interaction_text }}</p>
+          <ng-container *ngIf="interaction?.bot_response">
             <div>
               <p>Answer from visitor</p>
             </div>
-            <p>{{ interaction.bot_response }}</p>
+            <p>{{ interaction?.bot_response }}</p>
           </ng-container>
         </div>
       </div>

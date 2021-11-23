@@ -40,8 +40,8 @@ export class GroupComponent implements AfterViewInit {
 
     this.addSource();
     this.addTarget();
-
-    this.interaction.label = this.getInteractionLabelAndIcon().label;
+    if (this.interaction)
+      this.interaction.label = this.getInteractionLabelAndIcon().label;
     this.getNextThreeDaysFromToday();
   }
 
