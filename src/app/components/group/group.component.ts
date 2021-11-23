@@ -3,7 +3,7 @@ import { BrowserJsPlumbInstance } from '@jsplumb/browser-ui';
 import { interactionKind } from 'src/app/constants/interaction-kind';
 import { interactionList } from 'src/app/constants/interaction-list';
 import { interactionTypes } from 'src/app/constants/interaction-types';
-import { Interaction } from 'src/app/mock-data/mock-interaction';
+import { Interaction } from '../../chatbot/models/interaction';
 
 import { PlumbService } from '../../services/plumb.service';
 

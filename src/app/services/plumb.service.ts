@@ -20,7 +20,8 @@ import {
 import { PointXY } from '@jsplumb/util';
 
 import { NotificationService } from '../components/notification/notification.service';
-import { Interaction, mock_interactions } from '../mock-data/mock-interaction';
+import { Interaction} from '../chatbot/models/interaction';
+import { mock_interactions } from '../chatbot/mock-data/mock-interaction';
 import {
   ElementComponentRef,
   getConnectorMenuComponent,
