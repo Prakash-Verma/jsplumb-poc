@@ -468,17 +468,22 @@ export class PlumbService {
     };
 
     interactions.forEach((interaction, index) => {
+      const sourceId = interaction?.slug;
+      if (sourceId) {
       const routes: string[] = this.getInteractionConnectionTarget(
+          sourceId,
+          index,
         interactions,
         botRoutes,
-        index,
         interaction?.basic_route_slug
       );
+        let i = 0;
       const connections = routes.map((targetId) => {
+          i++;
         return <PlumbConnection>{
-          connectionId: 'conn' + index,
+            connectionId: 'conn' + index + '' + i,
           source: {
-            id: interaction.slug,
+              id: sourceId,
             isGroup: true,
           },
           target: {
@@ -488,25 +493,49 @@ export class PlumbService {
         };
       });
       jsonObj.connections = jsonObj.connections.concat(connections);
+      }
     });
+
     return jsonObj;
   }
 
   private getInteractionConnectionTarget(
+    interaction_slug: string,
+    index: number,
     interactions: Interaction[],
     botRoutes: BotRoutes[],
-    index: number,
     basic_route_slug?: string
   ): string[] {
     const targetRoutes: string[] = [];
+    const routingRules = botRoutes.find(
+      (route) => route.interaction.slug === interaction_slug
+    );
     if (basic_route_slug) {
       targetRoutes.push(basic_route_slug);
+    } else if (routingRules) {
+      routingRules.interaction_routes?.forEach((route) => {
+        const targetId = route.to_interaction_slug;
+        if (targetId) targetRoutes.push(targetId);
+      });
+      if (routingRules.otherwise_route?.slug)
+        targetRoutes.push(routingRules.otherwise_route?.slug);
+      else {
+        this.addNextInteractionAsTarget(interactions, index, targetRoutes);
+      }
     } else if (interactions.length > index) {
-      const nextInteractionId = interactions[index + 1]?.slug;
-      if (nextInteractionId) targetRoutes.push(nextInteractionId);
+      this.addNextInteractionAsTarget(interactions, index, targetRoutes);
     }
     return targetRoutes;
   }
+
+  private addNextInteractionAsTarget(
+    interactions: Interaction[],
+    index: number,
+    targetRoutes: string[]
+  ) {
+      const nextInteractionId = interactions[index + 1]?.slug;
+      if (nextInteractionId) targetRoutes.push(nextInteractionId);
+    }
 
   private createConnections(jsonObj: PlumbJson) {
     jsonObj.connections.forEach((conn) => {
