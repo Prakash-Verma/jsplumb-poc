@@ -32,6 +32,7 @@ import {
   PlumbJson,
   PlumbNode,
 } from './utils';
+import { BotRoutes } from '../chatbot/models/interaction-route';
 
 const elementPrefix = 'Element';
 const groupPrefix = 'Group';
@@ -105,7 +106,7 @@ export class PlumbService {
     if (!elementId) {
       elementId = `${groupPrefix}_${guidGenerator()}`;
     }
-    const isFirstElement = this.groups.length === 0;
+    //const isFirstElement = this.groups.length === 0;
 
     const componentRef = getGroupComponent(
       this.factoryResolver,
@@ -113,8 +114,8 @@ export class PlumbService {
     );
     componentRef.instance.elementId = elementId;
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
-    componentRef.instance.needSource = isFirstElement;
-    componentRef.instance.needTarget = !isFirstElement;
+    componentRef.instance.needSource = true;
+    componentRef.instance.needTarget = true;
     if (interaction) {
       componentRef.instance.interaction = interaction;
     }
@@ -388,17 +389,15 @@ export class PlumbService {
     this.elements = nodes;
   }
 
-  recreateWithChatbotData(mock_interactions: Interaction[]) {
+  recreateWithChatbotData(interactions: Interaction[], botRoutes: BotRoutes[]) {
     this.clear();
-    const interactions: Interaction[] = JSON.parse(
-      JSON.stringify(mock_interactions)
-    );
-
     let offsetLeft = 20;
     const offsetTop = window.innerHeight / 3;
 
+    this.jsPlumbInstance.setSuspendDrawing(true);
+
     const groups = interactions.map((interaction, i) => {
-      const component = this.addGroup(undefined, interaction, i + 1);
+      const component = this.addGroup(interaction?.slug, interaction, i + 1);
       // if (group.style) {
       //   component.location.nativeElement.style.left =
       //     group.style.offsetLeft + 'px';
@@ -412,6 +411,7 @@ export class PlumbService {
       return component;
     });
 
+    const jsonObj = this.createChatBotConnections(interactions, botRoutes);
     // const nodes = jsonObj.nodes.map((node) => {
     //   const component = this.addElement(node.id);
     //   if (node.style) {
@@ -446,15 +446,66 @@ export class PlumbService {
     //   });
     // }, 0);
 
-    // setTimeout(() => {
-    //   this.createConnections(jsonObj);
+    setTimeout(() => {
+      this.createConnections(jsonObj);
 
-    //   container.style.opacity = '1';
-    //   this.jsPlumbInstance.setSuspendDrawing(false);
-    // }, 0);
+      // container.style.opacity = '1';
+      this.jsPlumbInstance.setSuspendDrawing(false);
+      this.jsPlumbInstance.repaintEverything();
+    }, 0);
 
-    // this.groups = groups;
-    // this.elements = nodes;
+    //this.elements = nodes;
+  }
+
+  createChatBotConnections(
+    interactions: Interaction[],
+    botRoutes: BotRoutes[]
+  ) {
+    const jsonObj: PlumbJson = {
+      nodes: [],
+      groups: [],
+      connections: [],
+    };
+
+    interactions.forEach((interaction, index) => {
+      const routes: string[] = this.getInteractionConnectionTarget(
+        interactions,
+        botRoutes,
+        index,
+        interaction?.basic_route_slug
+      );
+      const connections = routes.map((targetId) => {
+        return <PlumbConnection>{
+          connectionId: 'conn' + index,
+          source: {
+            id: interaction.slug,
+            isGroup: true,
+          },
+          target: {
+            id: targetId,
+            isGroup: true,
+          },
+        };
+      });
+      jsonObj.connections = jsonObj.connections.concat(connections);
+    });
+    return jsonObj;
+  }
+
+  private getInteractionConnectionTarget(
+    interactions: Interaction[],
+    botRoutes: BotRoutes[],
+    index: number,
+    basic_route_slug?: string
+  ): string[] {
+    const targetRoutes: string[] = [];
+    if (basic_route_slug) {
+      targetRoutes.push(basic_route_slug);
+    } else if (interactions.length > index) {
+      const nextInteractionId = interactions[index + 1]?.slug;
+      if (nextInteractionId) targetRoutes.push(nextInteractionId);
+    }
+    return targetRoutes;
   }
 
   private createConnections(jsonObj: PlumbJson) {

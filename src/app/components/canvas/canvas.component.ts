@@ -8,6 +8,10 @@ import {
 import { PlumbService } from '../../services/plumb.service';
 import { mock_interactions } from '../../chatbot/mock-data/mock-interaction';
 import { mock_meeting_bot_interactions } from '../../chatbot/mock-data/mock-meeting_interactions';
+import { mock_meeting_bot_routing } from '../../chatbot/mock-data/mock-meeting-bot-routing';
+import { Interaction } from 'src/app/chatbot/models/interaction';
+import { BotRoutes } from 'src/app/chatbot/models/interaction-route';
+import { ChangeDetectorRef } from '@angular/core';
 @Component({
   selector: 'app-canvas',
   templateUrl: './canvas.component.html',
@@ -18,11 +22,18 @@ export class CanvasComponent {
   customElementsContainerRef!: ViewContainerRef;
   @ViewChild('container') containerRef!: ElementRef;
 
-  constructor(private plumbService: PlumbService) {}
+  constructor(
+    private plumbService: PlumbService,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   ngAfterViewInit() {
     this.plumbService.initializeJsInstance(this.containerRef);
     this.plumbService.setContainer(this.customElementsContainerRef);
+  }
+
+  ngAfterContentChecked() {
+    this.cdRef.detectChanges();
   }
 
   addElement() {
@@ -50,11 +61,21 @@ export class CanvasComponent {
   }
 
   ReCreateBot() {
-    this.plumbService.recreateWithChatbotData(mock_interactions);
+    this.recreateBot(mock_interactions, mock_meeting_bot_routing);
   }
 
   ReCreateMeetingBot() {
-    this.plumbService.recreateWithChatbotData(mock_meeting_bot_interactions);
+    this.recreateBot(mock_meeting_bot_interactions, mock_meeting_bot_routing);
   }
 
+  private recreateBot(
+    mockInteractions: Interaction[],
+    mockBotRoutes: BotRoutes[]
+  ) {
+    const interactions: Interaction[] = JSON.parse(
+      JSON.stringify(mockInteractions)
+    );
+    const botRoutes: BotRoutes[] = JSON.parse(JSON.stringify(mockBotRoutes));
+    this.plumbService.recreateWithChatbotData(interactions, botRoutes);
+  }
 }

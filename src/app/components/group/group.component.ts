@@ -15,7 +15,7 @@ import { PlumbService } from '../../services/plumb.service';
 export class GroupComponent implements AfterViewInit {
   @Input() elementId!: string;
   @Input() jsPlumbInstance!: BrowserJsPlumbInstance;
-  @Input() needSource = false;
+  @Input() needSource = true;
   @Input() needTarget = true;
   @Input() interaction!: Interaction;
   @Input() index: number = 0;

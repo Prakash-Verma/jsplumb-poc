@@ -2,7 +2,7 @@ import { BotRoutes } from '../models/interaction-route';
 
 export const mock_meeting_bot_routing: BotRoutes[] = [
   {
-    otherwise_route: { slug: 'INT-8081530D44' },
+    otherwise_route: undefined,
     interaction: { slug: 'INT-D1EFB7643F' },
     interaction_routes: [
       {
@@ -47,7 +47,7 @@ export const mock_meeting_bot_routing: BotRoutes[] = [
     interaction_routes: [
       {
         id: 118638,
-        to_interaction_slug: 'int-6c0d92273d',
+        to_interaction_slug: 'INT-E8EFD03B43',
         order: 0,
         interaction_route_rules: [
           {
@@ -55,7 +55,7 @@ export const mock_meeting_bot_routing: BotRoutes[] = [
             rule_type: 'current_answer',
             match_type: 'is_after_time',
             order: 1,
-            match_content: '04:00 am',
+            match_content: '04:00 pm',
             contact_field_id: '',
             contact_field_type: '',
             interaction: { slug: 'INT-3E39A6FA2D' },
