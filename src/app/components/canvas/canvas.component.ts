@@ -56,6 +56,10 @@ export class CanvasComponent {
     this.plumbService.clear();
   }
 
+  addRoutingRule() {
+    this.plumbService.addRoutingRule();
+  }
+
   ReCreate() {
     this.plumbService.recreate();
   }

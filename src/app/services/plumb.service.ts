@@ -26,13 +26,19 @@ import {
   getConnectorMenuComponent,
   getElementComponent,
   getGroupComponent,
+  getRoutingRuleComponent,
   GroupComponentRef,
   PlumbConnection,
   PlumbGroup,
   PlumbJson,
   PlumbNode,
+  RoutingRuleComponentRef,
 } from './utils';
 import { BotRoutes } from '../chatbot/models/interaction-route';
+import {
+  RoutingNodes,
+  RoutingRuleTarget,
+} from '../chatbot/models/routing-rule-target';
 
 const elementPrefix = 'Element';
 const groupPrefix = 'Group';
@@ -63,6 +69,8 @@ export class PlumbService {
 
   private elements: ElementComponentRef[] = [];
   private groups: GroupComponentRef[] = [];
+
+  private routingRules: RoutingRuleComponentRef[] = [];
 
   constructor(
     private factoryResolver: ComponentFactoryResolver,
@@ -95,6 +103,22 @@ export class PlumbService {
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
 
     this.elements.push(componentRef);
+    return componentRef;
+  }
+
+  public addRoutingRule(elementId?: string) {
+    if (!elementId) {
+      elementId = `${elementPrefix}_${guidGenerator()}`;
+    }
+
+    const componentRef = getRoutingRuleComponent(
+      this.factoryResolver,
+      this.containerRef
+    );
+    componentRef.instance.elementId = elementId;
+    componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
+
+    this.routingRules.push(componentRef);
     return componentRef;
   }
 
@@ -412,39 +436,39 @@ export class PlumbService {
     });
 
     const jsonObj = this.createChatBotConnections(interactions, botRoutes);
-    // const nodes = jsonObj.nodes.map((node) => {
-    //   const component = this.addElement(node.id);
-    //   if (node.style) {
-    //     component.location.nativeElement.style.left =
-    //       node.style.offsetLeft + 'px';
-    //     component.location.nativeElement.style.top =
-    //       node.style.offsetTop + 'px';
-    //   } else {
-    //     component.location.nativeElement.style.left = offsetLeft + 'px';
-    //     offsetLeft += component.location.nativeElement.offsetWidth + 100;
-    //     component.location.nativeElement.style.top = offsetTop + 'px';
-    //   }
-    //   return component;
-    // });
+    const nodes = jsonObj.nodes.map((node) => {
+      const component = this.addRoutingRule(node.id);
+      // if (node.style) {
+      //   component.location.nativeElement.style.left =
+      //     node.style.offsetLeft + 'px';
+      //   component.location.nativeElement.style.top =
+      //     node.style.offsetTop + 'px';
+      // } else {
+      component.location.nativeElement.style.left = offsetLeft + 'px';
+      offsetLeft += component.location.nativeElement.offsetWidth + 100;
+      component.location.nativeElement.style.top = offsetTop + 'px';
+      // }
+      return component;
+    });
 
-    // setTimeout(() => {
-    //   const normalGroup: PlumbGroup[] = [];
-    //   const groupWithNestedGroup: PlumbGroup[] = [];
-    //   jsonObj.groups.forEach((g) => {
-    //     const hasGroupAsChild = g.children.some((childId) =>
-    //       childId.includes('Group')
-    //     );
-    //     if (hasGroupAsChild) {
-    //       groupWithNestedGroup.push(g);
-    //     } else {
-    //       normalGroup.push(g);
-    //     }
-    //   });
+    setTimeout(() => {
+      //   const normalGroup: PlumbGroup[] = [];
+      //   const groupWithNestedGroup: PlumbGroup[] = [];
+      //   jsonObj.groups.forEach((g) => {
+      //     const hasGroupAsChild = g.children.some((childId) =>
+      //       childId.includes('Group')
+      //     );
+      //     if (hasGroupAsChild) {
+      //       groupWithNestedGroup.push(g);
+      //     } else {
+      //       normalGroup.push(g);
+      //     }
+      //   });
 
-    //   normalGroup.concat(groupWithNestedGroup).forEach((group) => {
-    //     this.addNodesToGroup(this.jsPlumbInstance, group);
-    //   });
-    // }, 0);
+      jsonObj.groups.forEach((group) => {
+        this.addRoutesToInteraction(this.jsPlumbInstance, group);
+      });
+    }, 0);
 
     setTimeout(() => {
       this.createConnections(jsonObj);
@@ -454,6 +478,8 @@ export class PlumbService {
       this.jsPlumbInstance.repaintEverything();
     }, 0);
 
+    this.groups = groups;
+    this.routingRules = nodes;
     //this.elements = nodes;
   }
 
@@ -470,33 +496,71 @@ export class PlumbService {
     interactions.forEach((interaction, index) => {
       const sourceId = interaction?.slug;
       if (sourceId) {
-      const routes: string[] = this.getInteractionConnectionTarget(
+        const routes: RoutingRuleTarget[] = this.getInteractionConnectionTarget(
           sourceId,
           index,
-        interactions,
-        botRoutes,
-        interaction?.basic_route_slug
-      );
+          interactions,
+          botRoutes,
+          interaction?.basic_route_slug
+        );
+
+        const childNodes: string[] = [];
+        const routingNodes: RoutingNodes[] = [];
+
         let i = 0;
-      const connections = routes.map((targetId) => {
+        let connectionSourceId = sourceId;
+        let isGroup = true;
+        const connections = routes.map((target) => {
           i++;
-        return <PlumbConnection>{
+          if (target.isRoutingRuleTarget) {
+            const nodeRuleId = this.getRoutingRuleNodeId(
+              sourceId,
+              target.ruleId
+            );
+            routingNodes.push({
+              interactionId: sourceId,
+              targetId: target.targetId,
+              nodeRuleId: nodeRuleId,
+              order: target.order || -1,
+            });
+            connectionSourceId = nodeRuleId;
+            isGroup = false;
+          }
+          return <PlumbConnection>{
             connectionId: 'conn' + index + '' + i,
-          source: {
-              id: sourceId,
-            isGroup: true,
-          },
-          target: {
-            id: targetId,
-            isGroup: true,
-          },
-        };
-      });
-      jsonObj.connections = jsonObj.connections.concat(connections);
+            source: {
+              id: connectionSourceId,
+              isGroup: isGroup,
+            },
+            target: {
+              id: target.targetId,
+              isGroup: true,
+            },
+          };
+        });
+        jsonObj.connections = jsonObj.connections.concat(connections);
+        const nodes = routingNodes.map((node) => {
+          const nodeId = node.nodeRuleId;
+          childNodes.push(nodeId);
+          return <PlumbNode>{
+            id: nodeId,
+          };
+        });
+        jsonObj.nodes = jsonObj.nodes.concat(nodes);
+
+        jsonObj.groups.push(<PlumbGroup>{ id: sourceId, children: childNodes });
       }
     });
 
     return jsonObj;
+  }
+
+  private getRoutingRuleNodeId(
+    interactionId: string,
+    nodeRuleId?: number
+  ): string {
+    if (nodeRuleId) return nodeRuleId + '';
+    return 'default_' + interactionId;
   }
 
   private getInteractionConnectionTarget(
@@ -505,25 +569,42 @@ export class PlumbService {
     interactions: Interaction[],
     botRoutes: BotRoutes[],
     basic_route_slug?: string
-  ): string[] {
-    const targetRoutes: string[] = [];
+  ): RoutingRuleTarget[] {
+    const targetRoutes: RoutingRuleTarget[] = [];
     const routingRules = botRoutes.find(
       (route) => route.interaction.slug === interaction_slug
     );
     if (basic_route_slug) {
-      targetRoutes.push(basic_route_slug);
+      targetRoutes.push({
+        targetId: basic_route_slug,
+        isRoutingRuleTarget: false,
+      });
     } else if (routingRules) {
       routingRules.interaction_routes?.forEach((route) => {
         const targetId = route.to_interaction_slug;
-        if (targetId) targetRoutes.push(targetId);
+        if (targetId)
+          targetRoutes.push(<RoutingRuleTarget>{
+            targetId: targetId,
+            isRoutingRuleTarget: true,
+            ruleId: route.id,
+            order: route.order,
+          });
       });
       if (routingRules.otherwise_route?.slug)
-        targetRoutes.push(routingRules.otherwise_route?.slug);
+        targetRoutes.push({
+          targetId: routingRules.otherwise_route?.slug,
+          isRoutingRuleTarget: true,
+        });
       else {
-        this.addNextInteractionAsTarget(interactions, index, targetRoutes);
+        this.addNextInteractionAsTarget(
+          interactions,
+          index,
+          targetRoutes,
+          true
+        );
       }
     } else if (interactions.length > index) {
-      this.addNextInteractionAsTarget(interactions, index, targetRoutes);
+      this.addNextInteractionAsTarget(interactions, index, targetRoutes, false);
     }
     return targetRoutes;
   }
@@ -531,11 +612,16 @@ export class PlumbService {
   private addNextInteractionAsTarget(
     interactions: Interaction[],
     index: number,
-    targetRoutes: string[]
+    targetRoutes: RoutingRuleTarget[],
+    isRoutingRuleTarget: boolean
   ) {
-      const nextInteractionId = interactions[index + 1]?.slug;
-      if (nextInteractionId) targetRoutes.push(nextInteractionId);
-    }
+    const nextInteractionId = interactions[index + 1]?.slug;
+    if (nextInteractionId)
+      targetRoutes.push({
+        targetId: nextInteractionId,
+        isRoutingRuleTarget: isRoutingRuleTarget,
+      });
+  }
 
   private createConnections(jsonObj: PlumbJson) {
     jsonObj.connections.forEach((conn) => {
@@ -575,6 +661,19 @@ export class PlumbService {
         if (isGroup) {
           return jsPlumbInstance.getGroup(childId).el;
         }
+        return jsPlumbInstance.getManagedElement(childId);
+      })
+      .filter(Boolean);
+    jsPlumbInstance.addToGroup(uiGroup, ...uiNodes);
+  }
+
+  private addRoutesToInteraction(
+    jsPlumbInstance: BrowserJsPlumbInstance,
+    group: PlumbGroup
+  ) {
+    const uiGroup = jsPlumbInstance.getGroup(group.id);
+    const uiNodes = group.children
+      .map((childId) => {
         return jsPlumbInstance.getManagedElement(childId);
       })
       .filter(Boolean);

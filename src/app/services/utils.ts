@@ -7,6 +7,7 @@ import {
 import { ConnectorMenuComponent } from '../components/connector-menu/connector-menu.component';
 import { ElementComponent } from '../components/element/element.component';
 import { GroupComponent } from '../components/group/group.component';
+import { RoutingRuleComponent } from '../components/routing-rule/routing-rule.component';
 
 export function getElementComponent(
   factoryResolver: ComponentFactoryResolver,
@@ -14,6 +15,14 @@ export function getElementComponent(
 ) {
   const factory = factoryResolver.resolveComponentFactory(ElementComponent);
   return containerRef.createComponent<ElementComponent>(factory);
+}
+
+export function getRoutingRuleComponent(
+  factoryResolver: ComponentFactoryResolver,
+  containerRef: ViewContainerRef
+) {
+  const factory = factoryResolver.resolveComponentFactory(RoutingRuleComponent);
+  return containerRef.createComponent<RoutingRuleComponent>(factory);
 }
 
 export function getGroupComponent(
@@ -61,3 +70,5 @@ export interface PlumbJson {
 export type ElementComponentRef = ComponentRef<ElementComponent>;
 
 export type GroupComponentRef = ComponentRef<GroupComponent>;
+
+export type RoutingRuleComponentRef = ComponentRef<RoutingRuleComponent>;

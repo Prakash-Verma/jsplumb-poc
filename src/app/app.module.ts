@@ -11,6 +11,7 @@ import { GroupComponent } from './components/group/group.component';
 import { NotificationComponent } from './components/notification/notification.component';
 import { NotificationService } from './components/notification/notification.service';
 import { PlumbService } from './services/plumb.service';
+import { RoutingRuleComponent } from './components/routing-rule/routing-rule.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { PlumbService } from './services/plumb.service';
     GroupComponent,
     NotificationComponent,
     ConnectorMenuComponent,
+    RoutingRuleComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, OuiIconModule],
   providers: [PlumbService, NotificationService],
