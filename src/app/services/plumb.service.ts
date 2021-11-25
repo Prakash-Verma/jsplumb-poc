@@ -607,17 +607,11 @@ function getEndpointForConnection(
 function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
   const left = (group.el.offsetWidth - element.offsetWidth) / 2 + 10;
 
-  let totalOffset = 0;
-  let count = 1;
-  for (let index = 0; index < group.children.length - 1; ++index) {
-    const child = group.children[index];
-    totalOffset += child.el.offsetHeight;
-    ++count;
-  }
+  const maxOffsetHeight = Math.max(
+    ...Array.from(group.el.children).map((x) => (<HTMLElement>x).offsetHeight)
+  );
 
-  const top = totalOffset + 50 + count * 5;
-
-  return { x: left, y: top };
+  return { x: left, y: maxOffsetHeight };
 }
 
 function guidGenerator() {
