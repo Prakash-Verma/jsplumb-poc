@@ -1,2 +1,11 @@
 <div class="close" (click)="deleteNode()">x</div>
-<div class="node">Routing Rule</div>
+<div class="node">
+  {{
+    interactionRouteModel
+      ? "Routing Rule " +
+        (interactionRouteModel.order === undefined
+          ? interactionRouteModel.order
+          : interactionRouteModel.order + 1)
+      : "Default Route"
+  }}
+</div>

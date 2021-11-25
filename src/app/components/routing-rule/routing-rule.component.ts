@@ -1,5 +1,12 @@
-import { AfterViewInit, Component, ElementRef, Input } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+} from '@angular/core';
 import { BrowserJsPlumbInstance } from '@jsplumb/browser-ui';
+import { InteractionRouteModel } from 'src/app/chatbot/models/interaction-route';
 
 import { PlumbService } from '../../services/plumb.service';
 @Component({
@@ -10,15 +17,24 @@ import { PlumbService } from '../../services/plumb.service';
 export class RoutingRuleComponent {
   @Input() elementId!: string;
   @Input() jsPlumbInstance!: BrowserJsPlumbInstance;
+  @Input() interactionRouteModel!: InteractionRouteModel;
 
   constructor(
     public elementRef: ElementRef,
-    private plumbService: PlumbService
+    private plumbService: PlumbService,
+    private cdRef: ChangeDetectorRef
   ) {}
+
+  ngOnInit() {
+    this.cdRef.detectChanges();
+  }
 
   ngAfterViewInit() {
     this.elementRef.nativeElement.id = this.elementId;
-    this.plumbService.addSourceElement(this.elementRef.nativeElement);
+    this.plumbService.addSourceElement(
+      this.elementRef.nativeElement,
+      '#0f8842'
+    );
     // this.plumbService.addTargetElement(this.elementRef.nativeElement);
   }
 

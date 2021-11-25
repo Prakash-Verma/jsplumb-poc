@@ -1,8 +1,9 @@
+import { InteractionRouteModel } from './interaction-route';
+
 export interface RoutingRuleTarget {
   targetId: string;
   isRoutingRuleTarget: boolean;
-  ruleId?: number;
-  order?: number;
+  interactionRouteModel?: InteractionRouteModel;
 }
 
 export interface RoutingNodes {
@@ -10,4 +11,5 @@ export interface RoutingNodes {
   targetId: string;
   nodeRuleId: string;
   order: number;
+  interactionRouteModel?: InteractionRouteModel;
 }

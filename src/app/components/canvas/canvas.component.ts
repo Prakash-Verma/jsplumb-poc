@@ -12,6 +12,7 @@ import { mock_meeting_bot_routing } from '../../chatbot/mock-data/mock-meeting-b
 import { Interaction } from 'src/app/chatbot/models/interaction';
 import { BotRoutes } from 'src/app/chatbot/models/interaction-route';
 import { ChangeDetectorRef } from '@angular/core';
+import { ChatbotService } from 'src/app/chatbot/services/chatbot.service';
 @Component({
   selector: 'app-canvas',
   templateUrl: './canvas.component.html',
@@ -24,6 +25,7 @@ export class CanvasComponent {
 
   constructor(
     private plumbService: PlumbService,
+    private chatBotService: ChatbotService,
     private cdRef: ChangeDetectorRef
   ) {}
 
@@ -80,6 +82,6 @@ export class CanvasComponent {
       JSON.stringify(mockInteractions)
     );
     const botRoutes: BotRoutes[] = JSON.parse(JSON.stringify(mockBotRoutes));
-    this.plumbService.recreateWithChatbotData(interactions, botRoutes);
+    this.chatBotService.recreateWithChatbotData(interactions, botRoutes);
   }
 }

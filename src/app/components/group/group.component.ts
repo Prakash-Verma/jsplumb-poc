@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, ElementRef, Input } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+} from '@angular/core';
 import { BrowserJsPlumbInstance } from '@jsplumb/browser-ui';
 import { interactionKind } from 'src/app/constants/interaction-kind';
 import { interactionList } from 'src/app/constants/interaction-list';
@@ -6,6 +12,7 @@ import { interactionTypes } from 'src/app/constants/interaction-types';
 import { Interaction } from '../../chatbot/models/interaction';
 
 import { PlumbService } from '../../services/plumb.service';
+import { GroupOptions, AddGroupOptions } from '@jsplumb/core';
 
 @Component({
   selector: 'app-group',
@@ -31,8 +38,13 @@ export class GroupComponent implements AfterViewInit {
 
   constructor(
     public elementRef: ElementRef,
-    private plumbService: PlumbService
+    private plumbService: PlumbService,
+    private cdRef: ChangeDetectorRef
   ) {}
+
+  ngOnInit() {
+    this.cdRef.detectChanges();
+  }
 
   ngAfterViewInit() {
     this.elementRef.nativeElement.id = this.elementId;
@@ -45,12 +57,22 @@ export class GroupComponent implements AfterViewInit {
     this.getNextThreeDaysFromToday();
   }
 
-  private addGroupElement() {
-    this.jsPlumbInstance.addGroup({
+  private addGroupElement(groupOptions?: GroupOptions) {
+    const addGroupElOptions = {
       el: this.elementRef.nativeElement,
       id: this.elementId,
-      orphan: true,
-    });
+    };
+    if (!groupOptions) {
+      groupOptions = {
+        orphan: true,
+        constrain: true,
+      };
+    }
+    const addGroupOptions: AddGroupOptions<Element> = {
+      ...addGroupElOptions,
+      ...groupOptions,
+    };
+    this.jsPlumbInstance.addGroup(addGroupOptions);
   }
 
   private addSource() {

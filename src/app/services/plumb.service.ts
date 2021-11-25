@@ -34,7 +34,7 @@ import {
   PlumbNode,
   RoutingRuleComponentRef,
 } from './utils';
-import { BotRoutes } from '../chatbot/models/interaction-route';
+import { InteractionRouteModel } from '../chatbot/models/interaction-route';
 import {
   RoutingNodes,
   RoutingRuleTarget,
@@ -106,7 +106,10 @@ export class PlumbService {
     return componentRef;
   }
 
-  public addRoutingRule(elementId?: string) {
+  public addRoutingRule(
+    elementId?: string,
+    interactionRouteModel?: InteractionRouteModel
+  ) {
     if (!elementId) {
       elementId = `${elementPrefix}_${guidGenerator()}`;
     }
@@ -117,7 +120,9 @@ export class PlumbService {
     );
     componentRef.instance.elementId = elementId;
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
-
+    if (interactionRouteModel) {
+      componentRef.instance.interactionRouteModel = interactionRouteModel;
+    }
     this.routingRules.push(componentRef);
     return componentRef;
   }
@@ -250,12 +255,15 @@ export class PlumbService {
     this.jsPlumbInstance.setPosition(element, position);
   }
 
-  public addSourceElement(nativeElement: HTMLElement) {
+  public addSourceElement(
+    nativeElement: HTMLElement,
+    color: string = '#b731a9'
+  ) {
     const source: EndpointOptions = {
       endpoint: 'Dot',
-      paintStyle: { fill: '#fff', stroke: '#b731a9' },
+      paintStyle: { fill: '#fff', stroke: color },
       source: true,
-      connectorStyle: { stroke: '#b731a9', strokeWidth: 1 },
+      connectorStyle: { stroke: color, strokeWidth: 1 },
       maxConnections: 5,
       connectorOverlays: [
         { type: 'PlainArrow', options: { location: 1, width: 12, length: 10 } },
@@ -403,7 +411,7 @@ export class PlumbService {
     }, 0);
 
     setTimeout(() => {
-      this.createConnections(jsonObj);
+      this.createConnections(jsonObj.connections);
 
       container.style.opacity = '1';
       this.jsPlumbInstance.setSuspendDrawing(false);
@@ -413,218 +421,15 @@ export class PlumbService {
     this.elements = nodes;
   }
 
-  recreateWithChatbotData(interactions: Interaction[], botRoutes: BotRoutes[]) {
-    this.clear();
-    let offsetLeft = 20;
-    const offsetTop = window.innerHeight / 3;
-
-    this.jsPlumbInstance.setSuspendDrawing(true);
-
-    const groups = interactions.map((interaction, i) => {
-      const component = this.addGroup(interaction?.slug, interaction, i + 1);
-      // if (group.style) {
-      //   component.location.nativeElement.style.left =
-      //     group.style.offsetLeft + 'px';
-      //   component.location.nativeElement.style.top =
-      //     group.style.offsetTop + 'px';
-      // } else {
-      component.location.nativeElement.style.left = offsetLeft + 'px';
-      offsetLeft += component.location.nativeElement.offsetWidth + 100;
-      component.location.nativeElement.style.top = offsetTop + 'px';
-      // }
-      return component;
-    });
-
-    const jsonObj = this.createChatBotConnections(interactions, botRoutes);
-    const nodes = jsonObj.nodes.map((node) => {
-      const component = this.addRoutingRule(node.id);
-      // if (node.style) {
-      //   component.location.nativeElement.style.left =
-      //     node.style.offsetLeft + 'px';
-      //   component.location.nativeElement.style.top =
-      //     node.style.offsetTop + 'px';
-      // } else {
-      component.location.nativeElement.style.left = offsetLeft + 'px';
-      offsetLeft += component.location.nativeElement.offsetWidth + 100;
-      component.location.nativeElement.style.top = offsetTop + 'px';
-      // }
-      return component;
-    });
-
-    setTimeout(() => {
-      //   const normalGroup: PlumbGroup[] = [];
-      //   const groupWithNestedGroup: PlumbGroup[] = [];
-      //   jsonObj.groups.forEach((g) => {
-      //     const hasGroupAsChild = g.children.some((childId) =>
-      //       childId.includes('Group')
-      //     );
-      //     if (hasGroupAsChild) {
-      //       groupWithNestedGroup.push(g);
-      //     } else {
-      //       normalGroup.push(g);
-      //     }
-      //   });
-
-      jsonObj.groups.forEach((group) => {
-        this.addRoutesToInteraction(this.jsPlumbInstance, group);
-      });
-    }, 0);
-
-    setTimeout(() => {
-      this.createConnections(jsonObj);
-
-      // container.style.opacity = '1';
-      this.jsPlumbInstance.setSuspendDrawing(false);
-      this.jsPlumbInstance.repaintEverything();
-    }, 0);
-
-    this.groups = groups;
-    this.routingRules = nodes;
-    //this.elements = nodes;
+  setSuspendDrawing(value: boolean) {
+    this.jsPlumbInstance.setSuspendDrawing(false);
+  }
+  repaintEverything() {
+    this.jsPlumbInstance.repaintEverything();
   }
 
-  createChatBotConnections(
-    interactions: Interaction[],
-    botRoutes: BotRoutes[]
-  ) {
-    const jsonObj: PlumbJson = {
-      nodes: [],
-      groups: [],
-      connections: [],
-    };
-
-    interactions.forEach((interaction, index) => {
-      const sourceId = interaction?.slug;
-      if (sourceId) {
-        const routes: RoutingRuleTarget[] = this.getInteractionConnectionTarget(
-          sourceId,
-          index,
-          interactions,
-          botRoutes,
-          interaction?.basic_route_slug
-        );
-
-        const childNodes: string[] = [];
-        const routingNodes: RoutingNodes[] = [];
-
-        let i = 0;
-        let connectionSourceId = sourceId;
-        let isGroup = true;
-        const connections = routes.map((target) => {
-          i++;
-          if (target.isRoutingRuleTarget) {
-            const nodeRuleId = this.getRoutingRuleNodeId(
-              sourceId,
-              target.ruleId
-            );
-            routingNodes.push({
-              interactionId: sourceId,
-              targetId: target.targetId,
-              nodeRuleId: nodeRuleId,
-              order: target.order || -1,
-            });
-            connectionSourceId = nodeRuleId;
-            isGroup = false;
-          }
-          return <PlumbConnection>{
-            connectionId: 'conn' + index + '' + i,
-            source: {
-              id: connectionSourceId,
-              isGroup: isGroup,
-            },
-            target: {
-              id: target.targetId,
-              isGroup: true,
-            },
-          };
-        });
-        jsonObj.connections = jsonObj.connections.concat(connections);
-        const nodes = routingNodes.map((node) => {
-          const nodeId = node.nodeRuleId;
-          childNodes.push(nodeId);
-          return <PlumbNode>{
-            id: nodeId,
-          };
-        });
-        jsonObj.nodes = jsonObj.nodes.concat(nodes);
-
-        jsonObj.groups.push(<PlumbGroup>{ id: sourceId, children: childNodes });
-      }
-    });
-
-    return jsonObj;
-  }
-
-  private getRoutingRuleNodeId(
-    interactionId: string,
-    nodeRuleId?: number
-  ): string {
-    if (nodeRuleId) return nodeRuleId + '';
-    return 'default_' + interactionId;
-  }
-
-  private getInteractionConnectionTarget(
-    interaction_slug: string,
-    index: number,
-    interactions: Interaction[],
-    botRoutes: BotRoutes[],
-    basic_route_slug?: string
-  ): RoutingRuleTarget[] {
-    const targetRoutes: RoutingRuleTarget[] = [];
-    const routingRules = botRoutes.find(
-      (route) => route.interaction.slug === interaction_slug
-    );
-    if (basic_route_slug) {
-      targetRoutes.push({
-        targetId: basic_route_slug,
-        isRoutingRuleTarget: false,
-      });
-    } else if (routingRules) {
-      routingRules.interaction_routes?.forEach((route) => {
-        const targetId = route.to_interaction_slug;
-        if (targetId)
-          targetRoutes.push(<RoutingRuleTarget>{
-            targetId: targetId,
-            isRoutingRuleTarget: true,
-            ruleId: route.id,
-            order: route.order,
-          });
-      });
-      if (routingRules.otherwise_route?.slug)
-        targetRoutes.push({
-          targetId: routingRules.otherwise_route?.slug,
-          isRoutingRuleTarget: true,
-        });
-      else {
-        this.addNextInteractionAsTarget(
-          interactions,
-          index,
-          targetRoutes,
-          true
-        );
-      }
-    } else if (interactions.length > index) {
-      this.addNextInteractionAsTarget(interactions, index, targetRoutes, false);
-    }
-    return targetRoutes;
-  }
-
-  private addNextInteractionAsTarget(
-    interactions: Interaction[],
-    index: number,
-    targetRoutes: RoutingRuleTarget[],
-    isRoutingRuleTarget: boolean
-  ) {
-    const nextInteractionId = interactions[index + 1]?.slug;
-    if (nextInteractionId)
-      targetRoutes.push({
-        targetId: nextInteractionId,
-        isRoutingRuleTarget: isRoutingRuleTarget,
-      });
-  }
-
-  private createConnections(jsonObj: PlumbJson) {
-    jsonObj.connections.forEach((conn) => {
+  createConnections(connections: PlumbConnection[]) {
+    connections.forEach((conn) => {
       this.createSingleConnection(conn);
     });
   }
@@ -667,17 +472,8 @@ export class PlumbService {
     jsPlumbInstance.addToGroup(uiGroup, ...uiNodes);
   }
 
-  private addRoutesToInteraction(
-    jsPlumbInstance: BrowserJsPlumbInstance,
-    group: PlumbGroup
-  ) {
-    const uiGroup = jsPlumbInstance.getGroup(group.id);
-    const uiNodes = group.children
-      .map((childId) => {
-        return jsPlumbInstance.getManagedElement(childId);
-      })
-      .filter(Boolean);
-    jsPlumbInstance.addToGroup(uiGroup, ...uiNodes);
+  addChildrenToGroup(group: PlumbGroup) {
+    this.addNodesToGroup(this.jsPlumbInstance, group);
   }
 
   private getPlumbNodes(savePosition: boolean) {

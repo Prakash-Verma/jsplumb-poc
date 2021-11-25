@@ -1,7 +1,15 @@
+.jtk-endpoint-connected {
+  svg {
+    circle {
+      fill: #0f8842 !important;
+    }
+  }
+}
+
 :host {
   position: absolute;
   padding: 4px 12px;
-  background-color: #b731a9;
+  background-color: #b1009f;
   border-radius: 4px;
   border: 2px solid #e1e1e1;
   text-align: center;
