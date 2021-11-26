@@ -10,11 +10,18 @@ import { PointXY } from '@jsplumb/util';
 
 import { ElementComponent } from '../components/element/element.component';
 import { GroupComponent } from '../components/group/group.component';
+import { ElementNode } from '../models/element';
 
 @Injectable()
 export class PlumbService {
   private containerRef: ViewContainerRef | undefined;
   jsPlumbInstance: BrowserJsPlumbInstance | undefined;
+
+  public rootViewContainer!: ViewContainerRef;
+
+  public setRootViewContainerRef(viewContainerRef: ViewContainerRef) {
+    this.rootViewContainer = viewContainerRef;
+  }
 
   constructor(private factoryResolver: ComponentFactoryResolver) {}
 
@@ -30,7 +37,7 @@ export class PlumbService {
     this.containerRef = containerRef;
   }
 
-  public addElement(elementId: string) {
+  public addElement(elementNode: ElementNode) {
     if (!this.containerRef) {
       throw new Error('Root container not initialized');
     }
@@ -39,16 +46,19 @@ export class PlumbService {
       throw new Error('jsPlumbInstance is not yet set');
     }
 
-    const factory =
-      this.factoryResolver.resolveComponentFactory(ElementComponent);
-    const componentRef =
-      this.containerRef.createComponent<ElementComponent>(factory);
-    componentRef.instance.elementId = elementId;
+    const factory = this.factoryResolver.resolveComponentFactory(
+      ElementComponent
+    );
+    const componentRef = this.containerRef.createComponent<ElementComponent>(
+      factory
+    );
+    componentRef.instance.elementId = elementNode.id;
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
+    componentRef.instance.elementNode = elementNode;
     return componentRef;
   }
 
-  public addGroup(elementId: string) {
+  public addGroup(elementNode: ElementNode) {
     if (!this.containerRef) {
       throw new Error('Root container not initialized');
     }
@@ -57,12 +67,15 @@ export class PlumbService {
       throw new Error('jsPlumbInstance is not yet set');
     }
 
-    const factory =
-      this.factoryResolver.resolveComponentFactory(GroupComponent);
-    const componentRef =
-      this.containerRef.createComponent<GroupComponent>(factory);
-    componentRef.instance.elementId = elementId;
+    const factory = this.factoryResolver.resolveComponentFactory(
+      GroupComponent
+    );
+    const componentRef = this.containerRef.createComponent<GroupComponent>(
+      factory
+    );
+    componentRef.instance.elementId = elementNode.id;
     componentRef.instance.jsPlumbInstance = this.jsPlumbInstance;
+    componentRef.instance.elementNode = elementNode;
     return componentRef;
   }
 
@@ -125,7 +138,16 @@ export class PlumbService {
     const position = calculatePosition(group, element);
     this.jsPlumbInstance?.setPosition(element, position);
   }
+
+  addConnection(connection: any) {
+    this.jsPlumbInstance?.connect({ uuids: connection?.uuids });
+  }
+
+  public clear() {
+    this.rootViewContainer.clear();
+  }
 }
+
 function calculatePosition(group: UIGroup<HTMLElement>, element: HTMLElement) {
   const left = (group.el.offsetWidth - element.offsetWidth) / 2;
 

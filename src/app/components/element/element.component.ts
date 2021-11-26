@@ -2,6 +2,9 @@ import { AfterViewInit, Component, ElementRef, Input } from '@angular/core';
 import { BrowserJsPlumbInstance } from '@jsplumb/browser-ui';
 import { FlowchartConnector } from '@jsplumb/connector-flowchart';
 import { EndpointOptions } from '@jsplumb/core';
+import { ConnectorOptions } from '@jsplumb/common';
+import { ElementNode } from 'src/app/models/element';
+import { CanvasService } from 'src/app/services/canvas.service';
 
 @Component({
   selector: 'app-element',
@@ -11,23 +14,36 @@ import { EndpointOptions } from '@jsplumb/core';
 export class ElementComponent implements AfterViewInit {
   @Input() elementId!: string;
   @Input() jsPlumbInstance!: BrowserJsPlumbInstance;
+  @Input() elementNode!: ElementNode;
 
-  constructor(public elementRef: ElementRef) {}
+  constructor(
+    public elementRef: ElementRef,
+    private canvasService: CanvasService
+  ) {}
 
   ngAfterViewInit() {
+    this.canvasService.setLocation(this.elementRef, this.elementNode);
     this.addSourceElement();
     this.addTargetElement();
   }
 
   private addSourceElement() {
+    const connectorOpt: ConnectorOptions = {
+      stub: 0,
+      gap: 0,
+      cssClass: `.connector {stroke: 'red', strokeWidth: 1}`,
+      hoverClass: '.connector hover{}',
+    };
     const source: EndpointOptions = {
       endpoint: 'Dot',
       paintStyle: { fill: 'blue' },
       source: true,
-      connector: FlowchartConnector.type,
+      connector: { type: FlowchartConnector.type, options: connectorOpt },
       maxConnections: 10,
-      connectorStyle: { stroke: '#99cb3a', strokeWidth: 2 },
-      connectorOverlays: [{ type: 'Arrow', options: { location: 1 } }],
+      connectorStyle: { stroke: '#b731a9', strokeWidth: 1 },
+      connectorOverlays: [
+        { type: 'Arrow', options: { location: 1, id: '', cssClass: '{}' } },
+      ],
     };
     this.jsPlumbInstance.addEndpoint(
       this.elementRef.nativeElement,
